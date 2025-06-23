@@ -1,9 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../services/daily_affirmation_service.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      DailyAffirmationService.showDailyAffirmationDialog(context);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -164,29 +178,13 @@ class HomeScreen extends StatelessWidget {
                                 onTap: () => context.go('/music'),
                               ),
                               _FeatureCard(
-                                title: 'Daily Affirmations',
-                                subtitle: 'Positive mindset',
-                                icon: Icons.favorite,
-                                color: const Color(
-                                  0xFF6BCF7F,
-                                ), // Green - growth
-                                onTap: () => context.go('/affirmations'),
-                              ),
-                              _FeatureCard(
                                 title: 'Goal Tracker',
-                                subtitle: 'Track progress',
-                                icon: Icons.track_changes,
+                                subtitle: 'Login history',
+                                icon: Icons.calendar_today,
                                 color: const Color(
                                   0xFF4ECDC4,
                                 ), // Teal - clarity
-                                onTap: () {
-                                  // TODO: Implement goal tracker
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Coming soon!'),
-                                    ),
-                                  );
-                                },
+                                onTap: () => context.go('/goal-tracker'),
                               ),
                             ],
                           ),
