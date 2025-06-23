@@ -1,0 +1,18 @@
+"/Users/koseioishi/code/zeal/ios/Pods/FirebaseStorage/FirebaseStorage/Sources/Storage.swift":
+  swift-dependencies: "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/FirebaseStorage.build/Objects-normal/x86_64/Storage.swiftdeps"
+  dependencies: "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/FirebaseStorage.build/Objects-normal/x86_64/Storage.d"
+  const-values: "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/FirebaseStorage.build/Objects-normal/x86_64/Storage.swiftconstvalues"
+  diagnostics: "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/FirebaseStorage.build/Objects-normal/x86_64/Storage.dia"
+  object: "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/FirebaseStorage.build/Objects-normal/x86_64/Storage.o"
+"/Users/koseioishi/code/zeal/ios/Pods/FirebaseStorage/FirebaseStorage/Sources/AsyncAwait.swift":
+  object: "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/FirebaseStorage.build/Objects-normal/x86_64/AsyncAwait.o"
+  diagnostics: "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/FirebaseStorage.build/Objects-normal/x86_64/AsyncAwait.dia"
+  const-values: "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/FirebaseStorage.build/Objects-normal/x86_64/AsyncAwait.swiftconstvalues"
+  swift-dependencies: "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/FirebaseStorage.build/Objects-normal/x86_64/AsyncAwait.swiftdeps"
+  dependencies: "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/FirebaseStorage.build/Objects-normal/x86_64/AsyncAwait.d"
+"/Users/koseioishi/code/zeal/ios/Pods/FirebaseStorage/FirebaseStorage/Sources/Result.swift":
+  dependencies: "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/FirebaseStorage.build/Objects-normal/x86_64/Result.d"
+  diagnostics: "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/FirebaseStorage.build/Objects-normal/x86_64/Result.dia"
+  object: "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/FirebaseStorage.build/Objects-normal/x86_64/Result.o"
+  const-values: "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/FirebaseStorage.build/Objects-normal/x86_64/Result.swiftconstvalues"
+  swift-dependencies: "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/FirebaseStorage.build/Objects-normal/x86_64/Result.swiftdeps"

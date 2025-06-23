@@ -1,0 +1,45 @@
+dependencies: \
+  /Users/koseioishi/code/zeal/ios/Pods/gRPC-Core/src/core/util/sync.cc \
+  /Users/koseioishi/code/zeal/ios/Pods/Target\ Support\ Files/gRPC-Core/gRPC-Core-prefix.pch \
+  /Users/koseioishi/code/zeal/ios/Pods/gRPC-Core/include/grpc/support/atm.h \
+  /Users/koseioishi/code/zeal/ios/Pods/gRPC-Core/include/grpc/support/port_platform.h \
+  /Users/koseioishi/code/zeal/ios/Pods/gRPC-Core/include/grpc/support/atm_gcc_atomic.h \
+  /Users/koseioishi/code/zeal/ios/Pods/gRPC-Core/include/grpc/support/sync.h \
+  /Users/koseioishi/code/zeal/ios/Pods/gRPC-Core/include/grpc/support/time.h \
+  /Users/koseioishi/code/zeal/ios/Pods/gRPC-Core/include/grpc/support/sync_generic.h \
+  /Users/koseioishi/code/zeal/ios/Pods/gRPC-Core/include/grpc/support/sync_posix.h \
+  /Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/abseil/absl.framework/Headers/log/check.h \
+  /Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/abseil/absl.framework/Headers/log/internal/check_impl.h \
+  /Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/abseil/absl.framework/Headers/base/optimization.h \
+  /Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/abseil/absl.framework/Headers/base/config.h \
+  /Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/abseil/absl.framework/Headers/base/options.h \
+  /Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/abseil/absl.framework/Headers/base/policy_checks.h \
+  /Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/abseil/absl.framework/Headers/log/internal/check_op.h \
+  /Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/abseil/absl.framework/Headers/base/attributes.h \
+  /Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/abseil/absl.framework/Headers/log/internal/nullguard.h \
+  /Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/abseil/absl.framework/Headers/log/internal/nullstream.h \
+  /Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/abseil/absl.framework/Headers/base/log_severity.h \
+  /Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/abseil/absl.framework/Headers/strings/string_view.h \
+  /Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/abseil/absl.framework/Headers/base/nullability.h \
+  /Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/abseil/absl.framework/Headers/base/internal/nullability_impl.h \
+  /Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/abseil/absl.framework/Headers/meta/type_traits.h \
+  /Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/abseil/absl.framework/Headers/base/internal/throw_delegate.h \
+  /Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/abseil/absl.framework/Headers/base/macros.h \
+  /Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/abseil/absl.framework/Headers/base/port.h \
+  /Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/abseil/absl.framework/Headers/log/internal/strip.h \
+  /Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/abseil/absl.framework/Headers/log/internal/log_message.h \
+  /Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/abseil/absl.framework/Headers/base/internal/errno_saver.h \
+  /Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/abseil/absl.framework/Headers/log/log_entry.h \
+  /Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/abseil/absl.framework/Headers/log/internal/config.h \
+  /Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/abseil/absl.framework/Headers/time/time.h \
+  /Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/abseil/absl.framework/Headers/time/civil_time.h \
+  /Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/abseil/absl.framework/Headers/time/internal/cctz/include/cctz/civil_time.h \
+  /Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/abseil/absl.framework/Headers/time/internal/cctz/include/cctz/civil_time_detail.h \
+  /Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/abseil/absl.framework/Headers/time/internal/cctz/include/cctz/time_zone.h \
+  /Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/abseil/absl.framework/Headers/types/span.h \
+  /Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/abseil/absl.framework/Headers/types/internal/span.h \
+  /Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/abseil/absl.framework/Headers/algorithm/algorithm.h \
+  /Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/abseil/absl.framework/Headers/log/log_sink.h \
+  /Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/abseil/absl.framework/Headers/strings/has_absl_stringify.h \
+  /Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/abseil/absl.framework/Headers/log/internal/conditions.h \
+  /Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/abseil/absl.framework/Headers/log/internal/voidify.h

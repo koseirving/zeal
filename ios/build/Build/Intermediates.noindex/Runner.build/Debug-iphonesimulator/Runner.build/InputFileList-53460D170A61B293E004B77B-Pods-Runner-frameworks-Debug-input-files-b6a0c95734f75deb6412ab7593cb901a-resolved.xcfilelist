@@ -1,0 +1,27 @@
+/Users/koseioishi/code/zeal/ios/Pods/Target Support Files/Pods-Runner/Pods-Runner-frameworks.sh
+/Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/BoringSSL-GRPC/openssl_grpc.framework
+/Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/FirebaseAppCheckInterop/FirebaseAppCheckInterop.framework
+/Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/FirebaseAuth/FirebaseAuth.framework
+/Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/FirebaseAuthInterop/FirebaseAuthInterop.framework
+/Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/FirebaseCore/FirebaseCore.framework
+/Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/FirebaseCoreExtension/FirebaseCoreExtension.framework
+/Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/FirebaseCoreInternal/FirebaseCoreInternal.framework
+/Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/FirebaseCrashlytics/FirebaseCrashlytics.framework
+/Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/FirebaseFirestore/FirebaseFirestore.framework
+/Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/FirebaseFirestoreInternal/FirebaseFirestoreInternal.framework
+/Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/FirebaseInstallations/FirebaseInstallations.framework
+/Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/FirebaseRemoteConfigInterop/FirebaseRemoteConfigInterop.framework
+/Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/FirebaseSessions/FirebaseSessions.framework
+/Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/FirebaseSharedSwift/FirebaseSharedSwift.framework
+/Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/FirebaseStorage/FirebaseStorage.framework
+/Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/GTMSessionFetcher/GTMSessionFetcher.framework
+/Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/GoogleDataTransport/GoogleDataTransport.framework
+/Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/GoogleUtilities/GoogleUtilities.framework
+/Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/PromisesObjC/FBLPromises.framework
+/Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/PromisesSwift/Promises.framework
+/Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/RecaptchaInterop/RecaptchaInterop.framework
+/Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/abseil/absl.framework
+/Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/gRPC-C++/grpcpp.framework
+/Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/gRPC-Core/grpc.framework
+/Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/leveldb-library/leveldb.framework
+/Users/koseioishi/code/zeal/ios/build/Build/Products/Debug-iphonesimulator/nanopb/nanopb.framework

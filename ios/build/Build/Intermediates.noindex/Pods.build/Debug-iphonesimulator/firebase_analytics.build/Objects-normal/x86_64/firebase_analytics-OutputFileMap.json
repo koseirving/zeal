@@ -1,0 +1,38 @@
+{
+  "" : {
+    "diagnostics" : "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/firebase_analytics.build/Objects-normal/x86_64/firebase_analytics-master.dia",
+    "emit-module-dependencies" : "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/firebase_analytics.build/Objects-normal/x86_64/firebase_analytics-master-emit-module.d",
+    "emit-module-diagnostics" : "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/firebase_analytics.build/Objects-normal/x86_64/firebase_analytics-master-emit-module.dia",
+    "swift-dependencies" : "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/firebase_analytics.build/Objects-normal/x86_64/firebase_analytics-master.swiftdeps"
+  },
+  "/Users/koseioishi/.pub-cache/hosted/pub.dev/firebase_analytics-11.5.0/ios/firebase_analytics/Sources/firebase_analytics/Constants.swift" : {
+    "const-values" : "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/firebase_analytics.build/Objects-normal/x86_64/Constants.swiftconstvalues",
+    "dependencies" : "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/firebase_analytics.build/Objects-normal/x86_64/Constants.d",
+    "diagnostics" : "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/firebase_analytics.build/Objects-normal/x86_64/Constants.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/firebase_analytics.build/Objects-normal/x86_64/Constants.o",
+    "llvm-bc" : "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/firebase_analytics.build/Objects-normal/x86_64/Constants.bc",
+    "object" : "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/firebase_analytics.build/Objects-normal/x86_64/Constants.o",
+    "swift-dependencies" : "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/firebase_analytics.build/Objects-normal/x86_64/Constants.swiftdeps",
+    "swiftmodule" : "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/firebase_analytics.build/Objects-normal/x86_64/Constants~partial.swiftmodule"
+  },
+  "/Users/koseioishi/.pub-cache/hosted/pub.dev/firebase_analytics-11.5.0/ios/firebase_analytics/Sources/firebase_analytics/FirebaseAnalyticsMessages.g.swift" : {
+    "const-values" : "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/firebase_analytics.build/Objects-normal/x86_64/FirebaseAnalyticsMessages.g.swiftconstvalues",
+    "dependencies" : "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/firebase_analytics.build/Objects-normal/x86_64/FirebaseAnalyticsMessages.g.d",
+    "diagnostics" : "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/firebase_analytics.build/Objects-normal/x86_64/FirebaseAnalyticsMessages.g.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/firebase_analytics.build/Objects-normal/x86_64/FirebaseAnalyticsMessages.g.o",
+    "llvm-bc" : "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/firebase_analytics.build/Objects-normal/x86_64/FirebaseAnalyticsMessages.g.bc",
+    "object" : "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/firebase_analytics.build/Objects-normal/x86_64/FirebaseAnalyticsMessages.g.o",
+    "swift-dependencies" : "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/firebase_analytics.build/Objects-normal/x86_64/FirebaseAnalyticsMessages.g.swiftdeps",
+    "swiftmodule" : "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/firebase_analytics.build/Objects-normal/x86_64/FirebaseAnalyticsMessages.g~partial.swiftmodule"
+  },
+  "/Users/koseioishi/.pub-cache/hosted/pub.dev/firebase_analytics-11.5.0/ios/firebase_analytics/Sources/firebase_analytics/FirebaseAnalyticsPlugin.swift" : {
+    "const-values" : "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/firebase_analytics.build/Objects-normal/x86_64/FirebaseAnalyticsPlugin.swiftconstvalues",
+    "dependencies" : "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/firebase_analytics.build/Objects-normal/x86_64/FirebaseAnalyticsPlugin.d",
+    "diagnostics" : "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/firebase_analytics.build/Objects-normal/x86_64/FirebaseAnalyticsPlugin.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/firebase_analytics.build/Objects-normal/x86_64/FirebaseAnalyticsPlugin.o",
+    "llvm-bc" : "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/firebase_analytics.build/Objects-normal/x86_64/FirebaseAnalyticsPlugin.bc",
+    "object" : "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/firebase_analytics.build/Objects-normal/x86_64/FirebaseAnalyticsPlugin.o",
+    "swift-dependencies" : "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/firebase_analytics.build/Objects-normal/x86_64/FirebaseAnalyticsPlugin.swiftdeps",
+    "swiftmodule" : "/Users/koseioishi/code/zeal/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/firebase_analytics.build/Objects-normal/x86_64/FirebaseAnalyticsPlugin~partial.swiftmodule"
+  }
+}

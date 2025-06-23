@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "757471946876",
+    "project_id": "zeal-product",
+    "storage_bucket": "zeal-product.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:757471946876:android:54b7a4bab1fa03997601f9",
+        "android_client_info": {
+          "package_name": "com.zeal.zeal"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAroKfb-zGkze_DPGjYEznbWVPHu8XSdBE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
