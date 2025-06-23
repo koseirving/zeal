@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'config/dev/firebase_options.dart';
 import 'config/app_config.dart';
 import 'main.dart';
+import 'services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,13 +18,16 @@ void main() async {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
-      print('Firebase initialized successfully for DEV environment');
+      debugPrint('Firebase initialized successfully for DEV environment');
     } else {
-      print('Firebase already initialized for DEV environment');
+      debugPrint('Firebase already initialized for DEV environment');
     }
+    
+    // Initialize notification service
+    await NotificationService.initialize();
   } catch (e) {
-    print('Firebase initialization error in DEV: $e');
+    debugPrint('Firebase initialization error in DEV: $e');
   }
   
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: ZealApp()));
 }
