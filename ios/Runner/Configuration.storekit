@@ -1,0 +1,100 @@
+{
+  "identifier" : "ZealStoreKitConfig",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "100",
+      "familyShareable" : false,
+      "internalID" : "tip_100",
+      "localizations" : [
+        {
+          "description" : "Small celebration tip",
+          "displayName" : "Tip ¥100",
+          "locale" : "en_US"
+        },
+        {
+          "description" : "小さなお祝い",
+          "displayName" : "¥100 チップ",
+          "locale" : "ja"
+        }
+      ],
+      "productID" : "tip_100",
+      "referenceName" : "Tip 100",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "300",
+      "familyShareable" : false,
+      "internalID" : "tip_300",
+      "localizations" : [
+        {
+          "description" : "Medium celebration tip",
+          "displayName" : "Tip ¥300",
+          "locale" : "en_US"
+        },
+        {
+          "description" : "中くらいのお祝い",
+          "displayName" : "¥300 チップ",
+          "locale" : "ja"
+        }
+      ],
+      "productID" : "tip_300",
+      "referenceName" : "Tip 300",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "500",
+      "familyShareable" : false,
+      "internalID" : "tip_500",
+      "localizations" : [
+        {
+          "description" : "Large celebration tip",
+          "displayName" : "Tip ¥500",
+          "locale" : "en_US"
+        },
+        {
+          "description" : "大きなお祝い",
+          "displayName" : "¥500 チップ",
+          "locale" : "ja"
+        }
+      ],
+      "productID" : "tip_500",
+      "referenceName" : "Tip 500",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "1000",
+      "familyShareable" : false,
+      "internalID" : "tip_1000",
+      "localizations" : [
+        {
+          "description" : "Premium celebration tip",
+          "displayName" : "Tip ¥1000",
+          "locale" : "en_US"
+        },
+        {
+          "description" : "プレミアムお祝い",
+          "displayName" : "¥1000 チップ",
+          "locale" : "ja"
+        }
+      ],
+      "productID" : "tip_1000",
+      "referenceName" : "Tip 1000",
+      "type" : "Consumable"
+    }
+  ],
+  "settings" : {
+    "_applicationInternalID" : "0",
+    "_developerTeamID" : "0",
+    "_lastSynchronizedDate" : 0
+  },
+  "subscriptionGroups" : [
+
+  ],
+  "version" : {
+    "major" : 3,
+    "minor" : 0
+  }
+}

@@ -73,6 +73,9 @@ dependencies:
   
   # Fonts
   google_fonts: ^6.2.1
+  
+  # In-App Purchase
+  in_app_purchase: ^3.1.13
 
 dev_dependencies:
   flutter_test:

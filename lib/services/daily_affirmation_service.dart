@@ -1,34 +1,46 @@
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import '../services/affirmation_service.dart';
+import '../services/local_storage_service.dart';
 import '../models/affirmation_model.dart';
 
 class DailyAffirmationService {
   static const String _lastShownDateKey = 'last_affirmation_shown_date';
+  static final LocalStorageService _storage = LocalStorageService();
 
   static Future<bool> shouldShowDailyAffirmation() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final lastShownDate = prefs.getString(_lastShownDateKey);
+      await _storage.initialize();
+      
+      final lastShownDate = await _storage.getString(_lastShownDateKey);
       final today = DateTime.now().toIso8601String().split('T')[0];
 
-      return lastShownDate != today;
+      final shouldShow = lastShownDate != today;
+      debugPrint('DailyAffirmationService: Should show affirmation: $shouldShow (last: $lastShownDate, today: $today)');
+      
+      return shouldShow;
     } catch (e) {
-      // If SharedPreferences fails, show the dialog (fail-safe)
+      debugPrint('DailyAffirmationService: Error checking affirmation show status: $e');
+      // If storage fails, show the dialog (fail-safe)
       return true;
     }
   }
 
   static Future<void> markAffirmationShown() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
+      await _storage.initialize();
+      
       final today = DateTime.now().toIso8601String().split('T')[0];
-      await prefs.setString(_lastShownDateKey, today);
+      final success = await _storage.setString(_lastShownDateKey, today);
+      
+      if (success) {
+        debugPrint('DailyAffirmationService: Affirmation shown date saved successfully (${_storage.storageType})');
+      } else {
+        debugPrint('DailyAffirmationService: Failed to save affirmation shown date');
+      }
     } catch (e) {
-      // If SharedPreferences fails, ignore silently
-      debugPrint('Failed to save affirmation shown date: $e');
+      debugPrint('DailyAffirmationService: Failed to save affirmation shown date: $e');
     }
   }
 

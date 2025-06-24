@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'config/app_config.dart';
 import 'firebase_options.dart';
 import 'screens/home_screen.dart';
@@ -10,30 +9,58 @@ import 'screens/content_screen.dart';
 import 'screens/affirmations_screen.dart';
 import 'screens/tip_screen.dart';
 import 'services/notification_service.dart';
+import 'services/local_storage_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Initialize Firebase
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  
-  // Initialize notification service
-  await NotificationService.initialize();
-  
-  // Initialize SharedPreferences
+  // Initialize Firebase (safe initialization)
   try {
-    await SharedPreferences.getInstance();
+    // Check if default app already exists
+    try {
+      Firebase.app(); // This will throw if no default app exists
+      debugPrint('Firebase already initialized');
+    } catch (_) {
+      // No default app exists, safe to initialize
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+      debugPrint('Firebase initialized successfully');
+    }
   } catch (e) {
-    debugPrint('Failed to initialize SharedPreferences: $e');
+    // Silently handle duplicate app error for development
+    if (e.toString().contains('duplicate-app') || e.toString().contains('already exists')) {
+      debugPrint('Firebase: Using existing instance');
+    } else {
+      debugPrint('Firebase initialization error: $e');
+    }
+    // Continue with app startup regardless
   }
   
   // Set environment to dev for now
   AppConfig.setEnvironment(Environment.dev);
   
+  // Initialize notification service
+  try {
+    await NotificationService.initialize();
+    debugPrint('Notification service initialized successfully');
+  } catch (e) {
+    debugPrint('Failed to initialize notification service: $e');
+  }
+  
+  // Initialize Local Storage Service
+  try {
+    final storageService = LocalStorageService();
+    final success = await storageService.initialize();
+    final stats = await storageService.getStorageStats();
+    debugPrint('Local storage initialized: ${stats['storageType']} (success: $success)');
+  } catch (e) {
+    debugPrint('Failed to initialize local storage: $e');
+  }
+  
   runApp(const ProviderScope(child: ZealApp()));
 }
+
 
 final _router = GoRouter(
   routes: [
