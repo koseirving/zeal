@@ -68,11 +68,7 @@ class _DailyAffirmationDialog extends StatelessWidget {
           gradient: const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF1A1A1A),
-              Color(0xFF0F0F0F),
-              Color(0xFF1A1A1A),
-            ],
+            colors: [Color(0xFF1A1A1A), Color(0xFF0F0F0F), Color(0xFF1A1A1A)],
           ),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
@@ -90,29 +86,6 @@ class _DailyAffirmationDialog extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Header with icon
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    const Color(0xFF6BCF7F).withOpacity(0.3),
-                    const Color(0xFF6BCF7F).withOpacity(0.1),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: const Color(0xFF6BCF7F).withOpacity(0.5),
-                  width: 1,
-                ),
-              ),
-              child: const Icon(
-                Icons.favorite,
-                color: Color(0xFF6BCF7F),
-                size: 32,
-              ),
-            ),
-
             const SizedBox(height: 20),
 
             // Title
@@ -198,11 +171,8 @@ class _DailyAffirmationDialog extends StatelessWidget {
                   ),
                 ),
                 child: const Text(
-                  'Thanks',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  'Let\'s Go',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
               ),
             ),

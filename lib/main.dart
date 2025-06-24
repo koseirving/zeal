@@ -8,6 +8,7 @@ import 'firebase_options.dart';
 import 'screens/home_screen.dart';
 import 'screens/content_screen.dart';
 import 'screens/affirmations_screen.dart';
+import 'screens/tip_screen.dart';
 import 'services/notification_service.dart';
 
 void main() async {
@@ -51,6 +52,10 @@ final _router = GoRouter(
     GoRoute(
       path: '/affirmations',
       builder: (context, state) => const AffirmationsScreen(),
+    ),
+    GoRoute(
+      path: '/tip',
+      builder: (context, state) => const TipScreen(),
     ),
   ],
 );
