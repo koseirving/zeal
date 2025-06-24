@@ -5,6 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../providers/video_provider.dart';
 import '../providers/music_provider.dart';
 import '../widgets/video_player_widget.dart';
+import 'goal_tracker_content.dart';
+import 'music_player_screen.dart';
 
 class ContentScreen extends ConsumerStatefulWidget {
   const ContentScreen({super.key});
@@ -19,6 +21,7 @@ class _ContentScreenState extends ConsumerState<ContentScreen> {
   final List<Widget> _screens = [
     const _VideoContent(),
     const _MusicContent(),
+    const GoalTrackerContent(),
   ];
 
   @override
@@ -29,24 +32,11 @@ class _ContentScreenState extends ConsumerState<ContentScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.home, color: Colors.white),
           onPressed: () {
-            if (context.canPop()) {
-              context.pop();
-            } else {
-              context.go('/');
-            }
+            context.go('/');
           },
         ),
-        title: Text(
-          _currentIndex == 0 ? 'Motivation Videos' : 'Focus Music',
-          style: GoogleFonts.crimsonText(
-            fontSize: 24,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-          ),
-        ),
-        centerTitle: true,
       ),
       body: Container(
         decoration: const BoxDecoration(
@@ -92,7 +82,9 @@ class _ContentScreenState extends ConsumerState<ContentScreen> {
           type: BottomNavigationBarType.fixed,
           selectedItemColor: _currentIndex == 0 
             ? const Color(0xFFFF6B35) 
-            : const Color(0xFFFFD93D),
+            : _currentIndex == 1
+              ? const Color(0xFFFFD93D)
+              : const Color(0xFF4ECDC4),
           unselectedItemColor: Colors.white54,
           selectedLabelStyle: GoogleFonts.crimsonText(
             fontSize: 12,
@@ -172,6 +164,41 @@ class _ContentScreenState extends ConsumerState<ContentScreen> {
                 ),
               ),
               label: 'Music',
+            ),
+            BottomNavigationBarItem(
+              icon: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  gradient: _currentIndex == 2
+                      ? LinearGradient(
+                          colors: [
+                            const Color(0xFF4ECDC4).withOpacity(0.3),
+                            const Color(0xFF4ECDC4).withOpacity(0.1),
+                          ],
+                        )
+                      : null,
+                  borderRadius: BorderRadius.circular(12),
+                  border: _currentIndex == 2
+                      ? Border.all(
+                          color: const Color(0xFF4ECDC4).withOpacity(0.5),
+                          width: 1,
+                        )
+                      : null,
+                ),
+                child: Icon(
+                  Icons.calendar_today,
+                  size: 24,
+                  shadows: _currentIndex == 2
+                      ? [
+                          Shadow(
+                            color: const Color(0xFF4ECDC4).withOpacity(0.6),
+                            blurRadius: 10,
+                          ),
+                        ]
+                      : null,
+                ),
+              ),
+              label: 'Tracker',
             ),
           ],
         ),
@@ -266,60 +293,11 @@ class _VideoContentState extends ConsumerState<_VideoContent> {
   }
 }
 
-class _MusicContent extends ConsumerWidget {
+class _MusicContent extends StatelessWidget {
   const _MusicContent();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final musicAsync = ref.watch(musicProvider);
-
-    return musicAsync.when(
-      loading: () => const Center(
-        child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFD93D)),
-        ),
-      ),
-      error: (error, stack) => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.error_outline,
-              color: Colors.red,
-              size: 64,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Error loading music: $error',
-              style: const TextStyle(color: Colors.white70),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-      data: (musicTracks) {
-        if (musicTracks.isEmpty) {
-          return const Center(
-            child: Text(
-              'No music available',
-              style: TextStyle(
-                color: Colors.white70,
-                fontSize: 18,
-              ),
-            ),
-          );
-        }
-
-        return Center(
-          child: Text(
-            'Music Player - ${musicTracks.length} tracks available',
-            style: GoogleFonts.crimsonText(
-              fontSize: 18,
-              color: Colors.white,
-            ),
-          ),
-        );
-      },
-    );
+  Widget build(BuildContext context) {
+    return const MusicPlayerScreen();
   }
 }
