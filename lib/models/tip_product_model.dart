@@ -27,28 +27,36 @@ class TipProduct {
   }
 
   // Predefined tip products for the app
-  static const List<TipProductInfo> availableTips = [
-    TipProductInfo(
-      id: 'tip_100',
-      amount: 100,
-      description: 'Small celebration tip',
-    ),
-    TipProductInfo(
-      id: 'tip_300',
-      amount: 300,
-      description: 'Medium celebration tip',
-    ),
-    TipProductInfo(
-      id: 'tip_500',
-      amount: 500,
-      description: 'Large celebration tip',
-    ),
-    TipProductInfo(
-      id: 'tip_1000',
-      amount: 1000,
-      description: 'Premium celebration tip',
-    ),
-  ];
+  static List<TipProductInfo> get availableTips => _getEnvironmentTips();
+  
+  static List<TipProductInfo> _getEnvironmentTips() {
+    // Use different product IDs for development and production
+    final isDev = const bool.fromEnvironment('dart.vm.product') == false;
+    final prefix = isDev ? 'dev_tip_' : 'tip_';
+    
+    return [
+      TipProductInfo(
+        id: '${prefix}100',
+        amount: 100,
+        description: 'Small celebration tip',
+      ),
+      TipProductInfo(
+        id: '${prefix}300',
+        amount: 300,
+        description: 'Medium celebration tip',
+      ),
+      TipProductInfo(
+        id: '${prefix}500',
+        amount: 500,
+        description: 'Large celebration tip',
+      ),
+      TipProductInfo(
+        id: '${prefix}1000',
+        amount: 1000,
+        description: 'Premium celebration tip',
+      ),
+    ];
+  }
 
   static TipProductInfo? getTipInfoById(String id) {
     try {
@@ -59,7 +67,9 @@ class TipProduct {
   }
 
   static String getTipIdByAmount(int amount) {
-    return 'tip_$amount';
+    final isDev = const bool.fromEnvironment('dart.vm.product') == false;
+    final prefix = isDev ? 'dev_tip_' : 'tip_';
+    return '$prefix$amount';
   }
 }
 

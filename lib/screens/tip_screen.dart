@@ -234,7 +234,7 @@ class _TipScreenState extends State<TipScreen> {
                     Expanded(
                       flex: 2,
                       child: ElevatedButton(
-                        onPressed: _isLoading ? null : () => _processTip(),
+                        onPressed: (_isLoading || _purchaseService.isPurchaseInProgress) ? null : () => _processTip(),
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           backgroundColor: const Color(0xFFFF6B35),
@@ -244,7 +244,7 @@ class _TipScreenState extends State<TipScreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: _isLoading
+                        child: _isLoading || _purchaseService.isPurchaseInProgress
                             ? const SizedBox(
                                 height: 20,
                                 width: 20,
@@ -253,13 +253,7 @@ class _TipScreenState extends State<TipScreen> {
                                   strokeWidth: 2,
                                 ),
                               )
-                            : Text(
-                                'Celebrate ¥$selectedAmount',
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
+                            : _getCelebrationButtonText(),
                       ),
                     ),
                   ],
@@ -268,6 +262,26 @@ class _TipScreenState extends State<TipScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _getCelebrationButtonText() {
+    final cooldownSeconds = _purchaseService.remainingCooldownSeconds;
+    if (cooldownSeconds > 0) {
+      return Text(
+        'Wait ${cooldownSeconds}s',
+        style: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+        ),
+      );
+    }
+    return Text(
+      'Celebrate ¥$selectedAmount',
+      style: const TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
       ),
     );
   }
