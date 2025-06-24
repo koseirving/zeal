@@ -166,7 +166,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 color: const Color(
                                   0xFFFF6B35,
                                 ), // Warm orange - passion
-                                onTap: () => context.go('/videos'),
+                                onTap: () => context.go('/content'),
                               ),
                               _FeatureCard(
                                 title: 'Focus Music',
@@ -175,16 +175,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 color: const Color(
                                   0xFFFFD93D,
                                 ), // Gold - excellence
-                                onTap: () => context.go('/music'),
-                              ),
-                              _FeatureCard(
-                                title: 'Goal Tracker',
-                                subtitle: 'Login history',
-                                icon: Icons.calendar_today,
-                                color: const Color(
-                                  0xFF4ECDC4,
-                                ), // Teal - clarity
-                                onTap: () => context.go('/goal-tracker'),
+                                onTap: () => context.go('/content'),
                               ),
                             ],
                           ),
