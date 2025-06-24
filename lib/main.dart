@@ -42,7 +42,11 @@ final _router = GoRouter(
     ),
     GoRoute(
       path: '/content',
-      builder: (context, state) => const ContentScreen(),
+      builder: (context, state) {
+        final tabParam = state.uri.queryParameters['tab'];
+        final initialTab = tabParam != null ? int.tryParse(tabParam) : null;
+        return ContentScreen(initialTab: initialTab);
+      },
     ),
     GoRoute(
       path: '/affirmations',

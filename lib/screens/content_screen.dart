@@ -6,17 +6,19 @@ import '../providers/video_provider.dart';
 import '../providers/music_provider.dart';
 import '../widgets/video_player_widget.dart';
 import 'goal_tracker_content.dart';
-import 'music_player_screen.dart';
+import 'music_player_content.dart';
 
 class ContentScreen extends ConsumerStatefulWidget {
-  const ContentScreen({super.key});
+  final int? initialTab;
+  
+  const ContentScreen({super.key, this.initialTab});
 
   @override
   ConsumerState<ContentScreen> createState() => _ContentScreenState();
 }
 
 class _ContentScreenState extends ConsumerState<ContentScreen> {
-  int _currentIndex = 0;
+  late int _currentIndex;
 
   final List<Widget> _screens = [
     const _VideoContent(),
@@ -25,19 +27,15 @@ class _ContentScreenState extends ConsumerState<ContentScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.initialTab ?? 0;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF0A0A0A),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.home, color: Colors.white),
-          onPressed: () {
-            context.go('/');
-          },
-        ),
-      ),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -298,6 +296,6 @@ class _MusicContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MusicPlayerScreen();
+    return const MusicPlayerContent();
   }
 }

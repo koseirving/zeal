@@ -16,7 +16,7 @@ class MusicService {
       title: 'Deep Focus Flow',
       artist: 'Ambient Collective',
       audioUrl: 'https://www.soundjay.com/misc/sounds/magic-chime-02.wav',
-      imageUrl: 'https://via.placeholder.com/300x300/6366F1/FFFFFF?text=Deep+Focus',
+      imageUrl: '',
       category: 'Focus',
       duration: 1800, // 30 minutes
       createdAt: DateTime.now().subtract(const Duration(days: 1)),
@@ -26,7 +26,7 @@ class MusicService {
       title: 'Mindful Meditation',
       artist: 'Zen Masters',
       audioUrl: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav',
-      imageUrl: 'https://via.placeholder.com/300x300/8B5CF6/FFFFFF?text=Meditation',
+      imageUrl: '',
       category: 'Meditation',
       duration: 2400, // 40 minutes
       createdAt: DateTime.now().subtract(const Duration(days: 2)),
@@ -36,7 +36,7 @@ class MusicService {
       title: 'Forest Sounds',
       artist: 'Nature Audio',
       audioUrl: 'https://www.soundjay.com/misc/sounds/magic-chime-02.wav',
-      imageUrl: 'https://via.placeholder.com/300x300/10B981/FFFFFF?text=Forest',
+      imageUrl: '',
       category: 'Nature',
       duration: 3600, // 60 minutes
       createdAt: DateTime.now().subtract(const Duration(days: 3)),
@@ -46,7 +46,7 @@ class MusicService {
       title: 'Piano Reflections',
       artist: 'Solo Piano',
       audioUrl: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav',
-      imageUrl: 'https://via.placeholder.com/300x300/F59E0B/FFFFFF?text=Piano',
+      imageUrl: '',
       category: 'Instrumental',
       duration: 2100, // 35 minutes
       createdAt: DateTime.now().subtract(const Duration(days: 4)),
@@ -56,7 +56,7 @@ class MusicService {
       title: 'Ocean Waves',
       artist: 'Nature Sounds',
       audioUrl: 'https://www.soundjay.com/misc/sounds/magic-chime-02.wav',
-      imageUrl: 'https://via.placeholder.com/300x300/06B6D4/FFFFFF?text=Ocean',
+      imageUrl: '',
       category: 'Nature',
       duration: 4800, // 80 minutes
       createdAt: DateTime.now().subtract(const Duration(days: 5)),
@@ -66,7 +66,7 @@ class MusicService {
       title: 'Concentration Boost',
       artist: 'Focus Lab',
       audioUrl: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav',
-      imageUrl: 'https://via.placeholder.com/300x300/EF4444/FFFFFF?text=Focus',
+      imageUrl: '',
       category: 'Focus',
       duration: 2700, // 45 minutes
       createdAt: DateTime.now().subtract(const Duration(days: 6)),
@@ -76,7 +76,7 @@ class MusicService {
       title: 'Ambient Space',
       artist: 'Cosmic Sounds',
       audioUrl: 'https://www.soundjay.com/misc/sounds/magic-chime-02.wav',
-      imageUrl: 'https://via.placeholder.com/300x300/7C3AED/FFFFFF?text=Space',
+      imageUrl: '',
       category: 'Ambient',
       duration: 3300, // 55 minutes
       createdAt: DateTime.now().subtract(const Duration(days: 7)),
@@ -86,7 +86,7 @@ class MusicService {
       title: 'Gentle Rain',
       artist: 'Weather Sounds',
       audioUrl: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav',
-      imageUrl: 'https://via.placeholder.com/300x300/6B7280/FFFFFF?text=Rain',
+      imageUrl: '',
       category: 'Nature',
       duration: 5400, // 90 minutes
       createdAt: DateTime.now().subtract(const Duration(days: 8)),

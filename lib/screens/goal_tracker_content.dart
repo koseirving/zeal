@@ -103,19 +103,19 @@ class _GoalTrackerContentState extends State<GoalTrackerContent> {
               const SizedBox(height: 30),
               
               // Calendar
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF1A1A1A), Color(0xFF0F0F0F)],
-                    ),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: const Color(0xFF4ECDC4).withOpacity(0.3),
-                      width: 1,
-                    ),
+              Container(
+                height: 400,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF1A1A1A), Color(0xFF0F0F0F)],
                   ),
-                  child: TableCalendar<DateTime>(
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: const Color(0xFF4ECDC4).withOpacity(0.3),
+                    width: 1,
+                  ),
+                ),
+                child: TableCalendar<DateTime>(
                     firstDay: DateTime.utc(2024, 1, 1),
                     lastDay: DateTime.utc(2030, 12, 31),
                     focusedDay: _focusedDay,
@@ -176,7 +176,7 @@ class _GoalTrackerContentState extends State<GoalTrackerContent> {
                     ),
                   ),
                 ),
-              ),
+              const SizedBox(height: 20),
             ],
           ),
         ),

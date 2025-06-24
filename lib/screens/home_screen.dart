@@ -166,7 +166,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 color: const Color(
                                   0xFFFF6B35,
                                 ), // Warm orange - passion
-                                onTap: () => context.go('/content'),
+                                onTap: () => context.go('/content?tab=0'),
                               ),
                               _FeatureCard(
                                 title: 'Focus Music',
@@ -175,7 +175,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 color: const Color(
                                   0xFFFFD93D,
                                 ), // Gold - excellence
-                                onTap: () => context.go('/content'),
+                                onTap: () => context.go('/content?tab=1'),
                               ),
                             ],
                           ),
