@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/daily_affirmation_service.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   // Mock data for community support
   final int _totalInvestors = 1247;
   
@@ -41,12 +43,11 @@ class _HomeScreenState extends State<HomeScreen> {
         child: SafeArea(
           child: Column(
             children: [
-              // Header
+              // Header with User Menu
               Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
                   children: [
-                    const SizedBox(height: 40),
                     // Add subtle glow effect to title
                     Stack(
                       children: [
@@ -268,6 +269,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ), // Gold - excellence
                                 onTap: () => context.go('/content?tab=1'),
                               ),
+                              // Debug card (only in development)
+                              if (kDebugMode)
+                                _FeatureCard(
+                                  title: 'Debug',
+                                  subtitle: 'Firestore connection',
+                                  icon: Icons.bug_report,
+                                  color: const Color(0xFF9CA3AF),
+                                  onTap: () => context.go('/debug'),
+                                ),
                             ],
                           ),
                         ),

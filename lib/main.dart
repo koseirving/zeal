@@ -3,42 +3,41 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:go_router/go_router.dart';
 import 'config/app_config.dart';
-import 'firebase_options.dart';
+import 'config/dev/firebase_options.dart' as dev_options;
+import 'config/prod/firebase_options.dart' as prod_options;
 import 'screens/home_screen.dart';
 import 'screens/content_screen.dart';
 import 'screens/affirmations_screen.dart';
 import 'screens/tip_screen.dart';
+import 'screens/debug_screen.dart';
 import 'services/notification_service.dart';
 import 'services/local_storage_service.dart';
+import 'providers/auth_provider.dart';
+import 'services/auth_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Initialize Firebase (safe initialization)
-  try {
-    // Check if default app already exists
-    try {
-      Firebase.app(); // This will throw if no default app exists
-      debugPrint('Firebase already initialized');
-    } catch (_) {
-      // No default app exists, safe to initialize
-      await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      );
-      debugPrint('Firebase initialized successfully');
-    }
-  } catch (e) {
-    // Silently handle duplicate app error for development
-    if (e.toString().contains('duplicate-app') || e.toString().contains('already exists')) {
-      debugPrint('Firebase: Using existing instance');
-    } else {
-      debugPrint('Firebase initialization error: $e');
-    }
-    // Continue with app startup regardless
-  }
-  
   // Set environment to dev for now
   AppConfig.setEnvironment(Environment.dev);
+  
+  // Initialize Firebase with proper environment-specific options
+  try {
+    FirebaseOptions options;
+    if (AppConfig.isDev) {
+      options = dev_options.DefaultFirebaseOptions.currentPlatform;
+      debugPrint('Using development Firebase project: zeal-develop');
+    } else {
+      options = prod_options.DefaultFirebaseOptions.currentPlatform;
+      debugPrint('Using production Firebase project: zeal-product');
+    }
+    
+    await Firebase.initializeApp(options: options);
+    debugPrint('Firebase initialized successfully with project: ${options.projectId}');
+  } catch (e) {
+    debugPrint('Firebase initialization error: $e');
+    // Continue with app startup regardless
+  }
   
   // Initialize notification service
   try {
@@ -58,10 +57,20 @@ void main() async {
     debugPrint('Failed to initialize local storage: $e');
   }
   
+  // Initialize anonymous authentication
+  try {
+    final authService = AuthService();
+    await authService.signInAnonymously();
+    debugPrint('Anonymous authentication completed');
+  } catch (e) {
+    debugPrint('Failed to initialize anonymous authentication: $e');
+    // Continue even if auth fails - app should still work
+  }
+  
   runApp(const ProviderScope(child: ZealApp()));
 }
 
-
+// Simple router without authentication guards
 final _router = GoRouter(
   routes: [
     GoRoute(
@@ -83,6 +92,10 @@ final _router = GoRouter(
     GoRoute(
       path: '/tip',
       builder: (context, state) => const TipScreen(),
+    ),
+    GoRoute(
+      path: '/debug',
+      builder: (context, state) => const DebugScreen(),
     ),
   ],
 );
