@@ -29,7 +29,8 @@ class _ContentScreenState extends ConsumerState<ContentScreen> {
   @override
   void initState() {
     super.initState();
-    _currentIndex = widget.initialTab ?? 0;
+    // Adjust initial tab index to account for home tab at index 0
+    _currentIndex = widget.initialTab != null ? widget.initialTab! + 1 : 1;
   }
 
   @override
@@ -49,7 +50,7 @@ class _ContentScreenState extends ConsumerState<ContentScreen> {
             stops: [0.0, 0.5, 1.0],
           ),
         ),
-        child: _screens[_currentIndex],
+        child: _currentIndex == 0 ? Container() : _screens[_currentIndex - 1],
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
@@ -71,18 +72,25 @@ class _ContentScreenState extends ConsumerState<ContentScreen> {
         child: BottomNavigationBar(
           currentIndex: _currentIndex,
           onTap: (index) {
-            setState(() {
-              _currentIndex = index;
-            });
+            if (index == 0) {
+              // Navigate to home screen
+              context.go('/');
+            } else {
+              setState(() {
+                _currentIndex = index;
+              });
+            }
           },
           backgroundColor: Colors.transparent,
           elevation: 0,
           type: BottomNavigationBarType.fixed,
           selectedItemColor: _currentIndex == 0 
-            ? const Color(0xFFFF6B35) 
+            ? const Color(0xFF6366F1) 
             : _currentIndex == 1
-              ? const Color(0xFFFFD93D)
-              : const Color(0xFF4ECDC4),
+              ? const Color(0xFFFF6B35) 
+              : _currentIndex == 2
+                ? const Color(0xFFFFD93D)
+                : const Color(0xFF4ECDC4),
           unselectedItemColor: Colors.white54,
           selectedLabelStyle: GoogleFonts.crimsonText(
             fontSize: 12,
@@ -100,13 +108,48 @@ class _ContentScreenState extends ConsumerState<ContentScreen> {
                   gradient: _currentIndex == 0
                       ? LinearGradient(
                           colors: [
+                            const Color(0xFF6366F1).withOpacity(0.3),
+                            const Color(0xFF6366F1).withOpacity(0.1),
+                          ],
+                        )
+                      : null,
+                  borderRadius: BorderRadius.circular(12),
+                  border: _currentIndex == 0
+                      ? Border.all(
+                          color: const Color(0xFF6366F1).withOpacity(0.5),
+                          width: 1,
+                        )
+                      : null,
+                ),
+                child: Icon(
+                  Icons.home,
+                  size: 24,
+                  shadows: _currentIndex == 0
+                      ? [
+                          Shadow(
+                            color: const Color(0xFF6366F1).withOpacity(0.6),
+                            blurRadius: 10,
+                          ),
+                        ]
+                      : null,
+                ),
+              ),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  gradient: _currentIndex == 1
+                      ? LinearGradient(
+                          colors: [
                             const Color(0xFFFF6B35).withOpacity(0.3),
                             const Color(0xFFFF6B35).withOpacity(0.1),
                           ],
                         )
                       : null,
                   borderRadius: BorderRadius.circular(12),
-                  border: _currentIndex == 0
+                  border: _currentIndex == 1
                       ? Border.all(
                           color: const Color(0xFFFF6B35).withOpacity(0.5),
                           width: 1,
@@ -116,7 +159,7 @@ class _ContentScreenState extends ConsumerState<ContentScreen> {
                 child: Icon(
                   Icons.play_circle_fill,
                   size: 24,
-                  shadows: _currentIndex == 0
+                  shadows: _currentIndex == 1
                       ? [
                           Shadow(
                             color: const Color(0xFFFF6B35).withOpacity(0.6),
@@ -132,7 +175,7 @@ class _ContentScreenState extends ConsumerState<ContentScreen> {
               icon: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  gradient: _currentIndex == 1
+                  gradient: _currentIndex == 2
                       ? LinearGradient(
                           colors: [
                             const Color(0xFFFFD93D).withOpacity(0.3),
@@ -141,7 +184,7 @@ class _ContentScreenState extends ConsumerState<ContentScreen> {
                         )
                       : null,
                   borderRadius: BorderRadius.circular(12),
-                  border: _currentIndex == 1
+                  border: _currentIndex == 2
                       ? Border.all(
                           color: const Color(0xFFFFD93D).withOpacity(0.5),
                           width: 1,
@@ -151,7 +194,7 @@ class _ContentScreenState extends ConsumerState<ContentScreen> {
                 child: Icon(
                   Icons.music_note,
                   size: 24,
-                  shadows: _currentIndex == 1
+                  shadows: _currentIndex == 2
                       ? [
                           Shadow(
                             color: const Color(0xFFFFD93D).withOpacity(0.6),
@@ -167,7 +210,7 @@ class _ContentScreenState extends ConsumerState<ContentScreen> {
               icon: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  gradient: _currentIndex == 2
+                  gradient: _currentIndex == 3
                       ? LinearGradient(
                           colors: [
                             const Color(0xFF4ECDC4).withOpacity(0.3),
@@ -176,7 +219,7 @@ class _ContentScreenState extends ConsumerState<ContentScreen> {
                         )
                       : null,
                   borderRadius: BorderRadius.circular(12),
-                  border: _currentIndex == 2
+                  border: _currentIndex == 3
                       ? Border.all(
                           color: const Color(0xFF4ECDC4).withOpacity(0.5),
                           width: 1,
@@ -186,7 +229,7 @@ class _ContentScreenState extends ConsumerState<ContentScreen> {
                 child: Icon(
                   Icons.calendar_today,
                   size: 24,
-                  shadows: _currentIndex == 2
+                  shadows: _currentIndex == 3
                       ? [
                           Shadow(
                             color: const Color(0xFF4ECDC4).withOpacity(0.6),

@@ -9,7 +9,6 @@ import 'screens/home_screen.dart';
 import 'screens/content_screen.dart';
 import 'screens/affirmations_screen.dart';
 import 'screens/tip_screen.dart';
-import 'screens/debug_screen.dart';
 import 'services/notification_service.dart';
 import 'services/local_storage_service.dart';
 import 'providers/auth_provider.dart';
@@ -92,10 +91,6 @@ final _router = GoRouter(
     GoRoute(
       path: '/tip',
       builder: (context, state) => const TipScreen(),
-    ),
-    GoRoute(
-      path: '/debug',
-      builder: (context, state) => const DebugScreen(),
     ),
   ],
 );

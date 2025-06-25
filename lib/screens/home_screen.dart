@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -269,15 +268,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 ), // Gold - excellence
                                 onTap: () => context.go('/content?tab=1'),
                               ),
-                              // Debug card (only in development)
-                              if (kDebugMode)
-                                _FeatureCard(
-                                  title: 'Debug',
-                                  subtitle: 'Firestore connection',
-                                  icon: Icons.bug_report,
-                                  color: const Color(0xFF9CA3AF),
-                                  onTap: () => context.go('/debug'),
-                                ),
                             ],
                           ),
                         ),
