@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/tip_purchase_service.dart';
 import '../models/tip_product_model.dart';
+import '../widgets/feedback_dialog.dart';
+import '../utils/error_messages.dart';
 
 class TipScreen extends StatefulWidget {
   const TipScreen({super.key});
@@ -293,19 +295,26 @@ class _TipScreenState extends State<TipScreen> {
     setState(() {
       _isLoading = true;
     });
+    
+    // Show loading dialog
+    if (mounted) {
+      FeedbackDialog.showLoading(context, message: ErrorMessages.processingPurchase);
+    }
 
     try {
       // Initialize purchase service if not already done
       final bool isInitialized = await _purchaseService.initialize();
       
       if (!isInitialized) {
-        _resetLoadingAndShowError('課金サービスが利用できません。しばらく時間をおいてから再度お試しください。');
+        if (mounted) FeedbackDialog.hideLoading(context);
+        _resetLoadingAndShowError(ErrorMessages.purchaseUnavailable);
         return;
       }
 
       // Check if the service is available
       if (!_purchaseService.isAvailable) {
-        _resetLoadingAndShowError('現在、課金機能をご利用いただけません。');
+        if (mounted) FeedbackDialog.hideLoading(context);
+        _resetLoadingAndShowError(ErrorMessages.purchaseUnavailable);
         return;
       }
 
@@ -314,7 +323,12 @@ class _TipScreenState extends State<TipScreen> {
       final TipPurchaseResponse response = await _purchaseService.purchaseTip(selectedAmount);
       debugPrint('TipScreen: Purchase response: ${response.result}');
       
-      // Reset loading state first
+      // Hide loading dialog
+      if (mounted) {
+        FeedbackDialog.hideLoading(context);
+      }
+      
+      // Reset loading state
       debugPrint('TipScreen: Resetting loading state (mounted: $mounted)');
       if (mounted) {
         setState(() {
@@ -323,16 +337,18 @@ class _TipScreenState extends State<TipScreen> {
         debugPrint('TipScreen: Loading state reset to false');
       }
       
-      // Small delay to ensure UI updates
-      await Future.delayed(const Duration(milliseconds: 200));
-      debugPrint('TipScreen: UI update delay completed');
-      
       // Handle response
       switch (response.result) {
         case TipPurchaseResult.success:
           debugPrint('TipScreen: Showing thank you dialog...');
           if (mounted) {
-            _showThankYouDialog();
+            await FeedbackDialog.showSuccess(
+              context,
+              title: ErrorMessages.purchaseSuccess,
+              message: ErrorMessages.tipThanks,
+              duration: const Duration(milliseconds: 3500),
+            );
+            _navigateBack();
             debugPrint('TipScreen: Thank you dialog shown');
           }
           break;
@@ -342,7 +358,19 @@ class _TipScreenState extends State<TipScreen> {
           break;
           
         case TipPurchaseResult.error:
-          _showErrorDialog(response.error ?? '購入中にエラーが発生しました。');
+          final errorMessage = response.error ?? ErrorMessages.purchaseFailed;
+          final userFriendlyError = ErrorMessages.getUserFriendlyError(errorMessage);
+          if (mounted) {
+            final shouldRetry = await FeedbackDialog.showError(
+              context,
+              title: 'エラー',
+              message: userFriendlyError,
+              showRetry: true,
+            );
+            if (shouldRetry) {
+              _processTip(); // Retry
+            }
+          }
           break;
           
         case TipPurchaseResult.pending:
@@ -354,140 +382,33 @@ class _TipScreenState extends State<TipScreen> {
       
     } catch (e) {
       debugPrint('TipScreen: Exception in _processTip: $e');
-      _resetLoadingAndShowError('予期しないエラーが発生しました。');
+      if (mounted) FeedbackDialog.hideLoading(context);
+      _resetLoadingAndShowError(ErrorMessages.getUserFriendlyError(e));
     }
   }
   
-  void _resetLoadingAndShowError(String message) {
+  void _resetLoadingAndShowError(String message) async {
     if (mounted) {
       setState(() {
         _isLoading = false;
       });
+      await FeedbackDialog.showError(
+        context,
+        title: 'エラー',
+        message: message,
+        showRetry: false,
+      );
     }
-    _showErrorDialog(message);
+  }
+  
+  void _navigateBack() {
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go('/');
+    }
   }
 
-  void _showThankYouDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 20),
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFF1A1A1A), Color(0xFF0F0F0F)],
-            ),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: const Color(0xFF4ECDC4).withOpacity(0.3),
-              width: 1,
-            ),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(
-                Icons.celebration,
-                color: Color(0xFFFFD93D),
-                size: 64,
-              ),
-              const SizedBox(height: 20),
-              Text(
-                'Amazing Achievement! Thank You for Your Support!',
-                style: GoogleFonts.crimsonText(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Your ¥$selectedAmount celebration means the world to us!\n\nWe\'re cheering you on for your next amazing achievement. Your journey inspires us all.',
-                style: const TextStyle(
-                  color: Colors.white70,
-                  fontSize: 16,
-                  height: 1.5,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context); // Close dialog
-                    if (context.canPop()) {
-                      context.pop(); // Close tip screen
-                    } else {
-                      context.go('/'); // Go to home
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    backgroundColor: const Color(0xFFFF6B35),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text(
-                    'Continue',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _showErrorDialog(String message) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A1A),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        title: const Text(
-          'エラー',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        content: Text(
-          message,
-          style: const TextStyle(
-            color: Colors.white70,
-            fontSize: 16,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text(
-              'OK',
-              style: TextStyle(
-                color: Color(0xFFFF6B35),
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   void _showPendingDialog() {
     showDialog(
