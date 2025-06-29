@@ -1,0 +1,26 @@
+rules_version = '2';
+
+// Firebase Storage rules for ZEAL project
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Allow authenticated users to read and write files
+    match /{allPaths=**} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Specific rules for videos directory
+    match /videos/{allPaths=**} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Specific rules for music directory
+    match /music/{allPaths=**} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Specific rules for images/thumbnails
+    match /videos/thumbnails/{allPaths=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}
