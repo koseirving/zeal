@@ -277,50 +277,6 @@ class _VideoContentState extends ConsumerState<_VideoContent> {
     ref.invalidate(videosProvider);
   }
 
-  void _showDebugInfo() {
-    final cacheInfo = VideoService().getCacheInfo();
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A1A),
-        title: const Text(
-          'Video Debug Info',
-          style: TextStyle(color: Colors.white),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Has Cached Videos: ${cacheInfo['hasCachedVideos']}',
-              style: const TextStyle(color: Colors.white70),
-            ),
-            Text(
-              'Cached Video Count: ${cacheInfo['cachedVideoCount']}',
-              style: const TextStyle(color: Colors.white70),
-            ),
-            Text(
-              'Last Cache Update: ${cacheInfo['lastCacheUpdate'] ?? 'Never'}',
-              style: const TextStyle(color: Colors.white70),
-            ),
-            Text(
-              'Cache Age (minutes): ${cacheInfo['cacheAge'] ?? 'N/A'}',
-              style: const TextStyle(color: Colors.white70),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text(
-              'Close',
-              style: TextStyle(color: Color(0xFFFF6B35)),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -414,21 +370,6 @@ class _VideoContentState extends ConsumerState<_VideoContent> {
                 },
               );
             },
-          ),
-        ),
-        // Debug button in top-right corner
-        Positioned(
-          top: 50,
-          right: 16,
-          child: FloatingActionButton(
-            mini: true,
-            backgroundColor: const Color(0xFF6366F1).withOpacity(0.8),
-            onPressed: _showDebugInfo,
-            child: const Icon(
-              Icons.bug_report,
-              color: Colors.white,
-              size: 16,
-            ),
           ),
         ),
       ],
