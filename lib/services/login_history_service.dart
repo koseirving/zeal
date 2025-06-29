@@ -13,8 +13,24 @@ class LoginHistoryService {
 
   Future<void> recordLogin(String userId) async {
     try {
-      final deviceInfo = await _getDeviceInfo();
-      final packageInfo = await PackageInfo.fromPlatform();
+      final deviceInfo = await _getDeviceInfo().timeout(
+        const Duration(seconds: 5),
+        onTimeout: () => {
+          'platform': 'Unknown',
+          'model': 'Timeout',
+          'version': 'Unknown',
+        },
+      );
+      
+      final packageInfo = await PackageInfo.fromPlatform().timeout(
+        const Duration(seconds: 5),
+        onTimeout: () => PackageInfo(
+          appName: 'Zeal',
+          packageName: 'com.zeal.zeal',
+          version: '1.0.0',
+          buildNumber: '1',
+        ),
+      );
       
       final loginSession = {
         'loginAt': FieldValue.serverTimestamp(),
@@ -27,9 +43,11 @@ class LoginHistoryService {
           .collection('users')
           .doc(userId)
           .collection('login_history')
-          .add(loginSession);
+          .add(loginSession)
+          .timeout(const Duration(seconds: 10));
     } catch (e) {
       debugPrint('Failed to record login: $e');
+      // Don't throw the error - login history is not critical for app functionality
     }
   }
 
@@ -40,7 +58,8 @@ class LoginHistoryService {
           .doc(userId)
           .collection('login_history')
           .orderBy('loginAt', descending: true)
-          .get();
+          .get()
+          .timeout(const Duration(seconds: 10));
 
       final loginDays = <DateTime>{};
       for (final doc in querySnapshot.docs) {

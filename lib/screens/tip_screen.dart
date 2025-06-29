@@ -61,206 +61,209 @@ class _TipScreenState extends State<TipScreen> {
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(24.0),
-            child: Column(
-              children: [
-                const SizedBox(height: 40),
-                
-                // Header Icon
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        const Color(0xFFFF6B35).withOpacity(0.3),
-                        const Color(0xFFFFD93D).withOpacity(0.3),
-                      ],
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  const SizedBox(height: 40),
+                  
+                  // Header Icon
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          const Color(0xFFFF6B35).withOpacity(0.3),
+                          const Color(0xFFFFD93D).withOpacity(0.3),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(50),
+                      border: Border.all(
+                        color: const Color(0xFFFF6B35).withOpacity(0.5),
+                        width: 2,
+                      ),
                     ),
-                    borderRadius: BorderRadius.circular(50),
-                    border: Border.all(
-                      color: const Color(0xFFFF6B35).withOpacity(0.5),
-                      width: 2,
-                    ),
-                  ),
-                  child: const Icon(
-                    Icons.local_fire_department,
-                    color: Color(0xFFFF6B35),
-                    size: 48,
-                  ),
-                ),
-                
-                const SizedBox(height: 32),
-                
-                // Title
-                Text(
-                  'Celebrate Your Wins',
-                  style: GoogleFonts.crimsonText(
-                    fontSize: 32,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                    letterSpacing: 1,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                
-                const SizedBox(height: 16),
-                
-                // Subtitle
-                Text(
-                  'When your dreams start coming true,\nshare your success with us',
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 18,
-                    height: 1.5,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                
-                const SizedBox(height: 48),
-                
-                // Amount Selection
-                Text(
-                  'Celebrate with us',
-                  style: GoogleFonts.crimsonText(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white,
-                  ),
-                ),
-                
-                const SizedBox(height: 24),
-                
-                // Amount Buttons Grid
-                Column(
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _TipAmountCard(
-                            amount: 100,
-                            isSelected: selectedAmount == 100,
-                            onTap: () => setState(() => selectedAmount = 100),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: _TipAmountCard(
-                            amount: 300,
-                            isSelected: selectedAmount == 300,
-                            onTap: () => setState(() => selectedAmount = 300),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _TipAmountCard(
-                            amount: 500,
-                            isSelected: selectedAmount == 500,
-                            onTap: () => setState(() => selectedAmount = 500),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: _TipAmountCard(
-                            amount: 1000,
-                            isSelected: selectedAmount == 1000,
-                            onTap: () => setState(() => selectedAmount = 1000),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                
-                const Spacer(),
-                
-                // Disclaimer
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF1A1A1A).withOpacity(0.5),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: const Color(0xFF4ECDC4).withOpacity(0.2),
-                      width: 1,
+                    child: const Icon(
+                      Icons.local_fire_department,
+                      color: Color(0xFFFF6B35),
+                      size: 48,
                     ),
                   ),
-                  child: const Text(
-                    'Every step forward, every breakthrough, every dream realized - we want to celebrate with you. Your success story inspires the next dreamer.',
-                    style: TextStyle(
-                      color: Colors.white60,
-                      fontSize: 14,
-                      height: 1.4,
+                  
+                  const SizedBox(height: 32),
+                  
+                  // Title
+                  Text(
+                    'Celebrate Your Wins',
+                    style: GoogleFonts.crimsonText(
+                      fontSize: 32,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                      letterSpacing: 1,
                     ),
                     textAlign: TextAlign.center,
                   ),
-                ),
-                
-                const SizedBox(height: 24),
-                
-                // Action Buttons
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextButton(
-                        onPressed: () {
-                          if (context.canPop()) {
-                            context.pop();
-                          } else {
-                            context.go('/');
-                          }
-                        },
-                        style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            side: BorderSide(
-                              color: Colors.white.withOpacity(0.2),
-                              width: 1,
+                  
+                  const SizedBox(height: 16),
+                  
+                  // Subtitle
+                  Text(
+                    'When your dreams start coming true,\nshare your success with us',
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 18,
+                      height: 1.5,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  
+                  const SizedBox(height: 48),
+                  
+                  // Amount Selection
+                  Text(
+                    'Celebrate with us',
+                    style: GoogleFonts.crimsonText(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 24),
+                  
+                  // Amount Buttons Grid
+                  Column(
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _TipAmountCard(
+                              amount: 100,
+                              isSelected: selectedAmount == 100,
+                              onTap: () => setState(() => selectedAmount = 100),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: _TipAmountCard(
+                              amount: 300,
+                              isSelected: selectedAmount == 300,
+                              onTap: () => setState(() => selectedAmount = 300),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _TipAmountCard(
+                              amount: 500,
+                              isSelected: selectedAmount == 500,
+                              onTap: () => setState(() => selectedAmount = 500),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: _TipAmountCard(
+                              amount: 1000,
+                              isSelected: selectedAmount == 1000,
+                              onTap: () => setState(() => selectedAmount = 1000),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  
+                  const SizedBox(height: 48),
+                  
+                  // Disclaimer
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1A1A1A).withOpacity(0.5),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: const Color(0xFF4ECDC4).withOpacity(0.2),
+                        width: 1,
+                      ),
+                    ),
+                    child: const Text(
+                      'Every step forward, every breakthrough, every dream realized - we want to celebrate with you. Your success story inspires the next dreamer.',
+                      style: TextStyle(
+                        color: Colors.white60,
+                        fontSize: 14,
+                        height: 1.4,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 24),
+                  
+                  // Action Buttons
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextButton(
+                          onPressed: () {
+                            if (context.canPop()) {
+                              context.pop();
+                            } else {
+                              context.go('/');
+                            }
+                          },
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              side: BorderSide(
+                                color: Colors.white.withOpacity(0.2),
+                                width: 1,
+                              ),
+                            ),
+                          ),
+                          child: const Text(
+                            'Not Now',
+                            style: TextStyle(
+                              color: Colors.white60,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ),
-                        child: const Text(
-                          'Not Now',
-                          style: TextStyle(
-                            color: Colors.white60,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        flex: 2,
+                        child: ElevatedButton(
+                          onPressed: (_isLoading || _purchaseService.isPurchaseInProgress) ? null : () => _processTip(),
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            backgroundColor: const Color(0xFFFF6B35),
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
+                          child: _isLoading || _purchaseService.isPurchaseInProgress
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : _getCelebrationButtonText(),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      flex: 2,
-                      child: ElevatedButton(
-                        onPressed: (_isLoading || _purchaseService.isPurchaseInProgress) ? null : () => _processTip(),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          backgroundColor: const Color(0xFFFF6B35),
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: _isLoading || _purchaseService.isPurchaseInProgress
-                            ? const SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : _getCelebrationButtonText(),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                ],
+              ),
             ),
           ),
         ),

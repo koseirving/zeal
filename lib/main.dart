@@ -26,14 +26,11 @@ void main() async {
     FirebaseOptions options;
     if (AppConfig.isDev) {
       options = dev_options.DefaultFirebaseOptions.currentPlatform;
-      debugPrint('Using development Firebase project: zeal-develop');
     } else {
       options = prod_options.DefaultFirebaseOptions.currentPlatform;
-      debugPrint('Using production Firebase project: zeal-product');
     }
     
     await Firebase.initializeApp(options: options);
-    debugPrint('Firebase initialized successfully with project: ${options.projectId}');
   } catch (e) {
     debugPrint('Firebase initialization error: $e');
     // Continue with app startup regardless
@@ -42,7 +39,6 @@ void main() async {
   // Initialize notification service
   try {
     await NotificationService.initialize();
-    debugPrint('Notification service initialized successfully');
   } catch (e) {
     debugPrint('Failed to initialize notification service: $e');
   }
@@ -50,9 +46,7 @@ void main() async {
   // Initialize Local Storage Service
   try {
     final storageService = LocalStorageService();
-    final success = await storageService.initialize();
-    final stats = await storageService.getStorageStats();
-    debugPrint('Local storage initialized: ${stats['storageType']} (success: $success)');
+    await storageService.initialize();
   } catch (e) {
     debugPrint('Failed to initialize local storage: $e');
   }
@@ -61,19 +55,24 @@ void main() async {
   try {
     final authService = AuthService();
     
+    // Wait a bit for Firebase to be fully ready
+    await Future.delayed(const Duration(milliseconds: 100));
+    
     // Check if user is already authenticated
     if (authService.isAuthenticated) {
       // Record login history for existing user
       if (authService.currentUserId != null) {
-        final loginHistoryService = LoginHistoryService();
-        await loginHistoryService.recordLogin(authService.currentUserId!);
+        try {
+          final loginHistoryService = LoginHistoryService();
+          await loginHistoryService.recordLogin(authService.currentUserId!);
+        } catch (loginError) {
+          debugPrint('Failed to record login history: $loginError');
+        }
       }
     } else {
       // Sign in anonymously (this will also record login history)
       await authService.signInAnonymously();
     }
-    
-    debugPrint('Anonymous authentication completed');
   } catch (e) {
     debugPrint('Failed to initialize anonymous authentication: $e');
     // Continue even if auth fails - app should still work

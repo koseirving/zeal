@@ -20,19 +20,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _checkAuthStatus();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkAuthStatus();
       DailyAffirmationService.showDailyAffirmationDialog(context);
     });
   }
   
   void _checkAuthStatus() {
-    // Optional: Basic auth status logging for development
-    if (kDebugMode) {
-      final authService = AuthService();
-      final user = authService.currentUser;
-      debugPrint('Auth Status: ${authService.isAuthenticated ? "✅" : "❌"} User: ${user?.uid}');
-    }
+    // Authentication is handled in main.dart during app initialization
   }
 
   @override
