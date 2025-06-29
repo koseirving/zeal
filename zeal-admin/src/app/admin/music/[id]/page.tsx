@@ -4,7 +4,7 @@ import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { doc, getDoc, addDoc, updateDoc, collection } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db, storage } from '../../../../../lib/firebase';
+import { db, storage, auth } from '../../../../../lib/firebase';
 import { Music } from '../../../../../lib/types';
 import AuthGuard from '../../../../../components/AuthGuard';
 import Layout from '../../../../../components/Layout';
@@ -56,9 +56,23 @@ export default function MusicEditPage({ params }: { params: Promise<{ id: string
   };
 
   const uploadFile = async (file: File, path: string): Promise<string> => {
-    const storageRef = ref(storage, path);
-    const snapshot = await uploadBytes(storageRef, file);
-    return await getDownloadURL(snapshot.ref);
+    console.log(`Starting upload for file: ${file.name}, Path: ${path}`);
+    
+    try {
+      const storageRef = ref(storage, path);
+      console.log('Storage reference created:', storageRef);
+      
+      const snapshot = await uploadBytes(storageRef, file);
+      console.log('File uploaded successfully, getting download URL...');
+      
+      const downloadUrl = await getDownloadURL(snapshot.ref);
+      console.log('Download URL obtained:', downloadUrl);
+      
+      return downloadUrl;
+    } catch (error) {
+      console.error('Upload error details:', error);
+      throw error;
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -67,37 +81,72 @@ export default function MusicEditPage({ params }: { params: Promise<{ id: string
     setUploading(true);
 
     try {
+      console.log('Starting music save process...');
+      
+      // Check authentication status
+      const user = auth.currentUser;
+      console.log('Current user:', user);
+      console.log('User authenticated:', !!user);
+      if (user) {
+        console.log('User ID:', user.uid);
+        console.log('User email:', user.email);
+      }
+      
       let audioUrl = music.audioUrl;
       let imageUrl = music.imageUrl;
 
+      // Audio file upload
       if (audioFile) {
+        console.log('Uploading audio file:', audioFile.name, 'Size:', audioFile.size);
         const audioPath = `music/audio/${Date.now()}_${audioFile.name}`;
-        audioUrl = await uploadFile(audioFile, audioPath);
+        try {
+          audioUrl = await uploadFile(audioFile, audioPath);
+          console.log('Audio file uploaded successfully:', audioUrl);
+        } catch (uploadError) {
+          console.error('Audio upload failed:', uploadError);
+          throw new Error(`音楽ファイルのアップロードに失敗しました: ${uploadError instanceof Error ? uploadError.message : 'Unknown error'}`);
+        }
       }
 
+      // Image file upload
       if (imageFile) {
+        console.log('Uploading image file:', imageFile.name, 'Size:', imageFile.size);
         const imagePath = `music/images/${Date.now()}_${imageFile.name}`;
-        imageUrl = await uploadFile(imageFile, imagePath);
+        try {
+          imageUrl = await uploadFile(imageFile, imagePath);
+          console.log('Image file uploaded successfully:', imageUrl);
+        } catch (uploadError) {
+          console.error('Image upload failed:', uploadError);
+          throw new Error(`画像ファイルのアップロードに失敗しました: ${uploadError instanceof Error ? uploadError.message : 'Unknown error'}`);
+        }
       }
 
+      // Prepare data for Firestore
       const data = {
         ...music,
         audioUrl,
-        imageUrl,
+        ...(imageUrl && { imageUrl }),
         updatedAt: new Date(),
         ...(isNew && { createdAt: new Date() })
       };
 
+      console.log('Saving data to Firestore:', data);
+
+      // Save to Firestore
       if (isNew) {
-        await addDoc(collection(db, 'music'), data);
+        const docRef = await addDoc(collection(db, 'music'), data);
+        console.log('New music document created with ID:', docRef.id);
       } else {
         await updateDoc(doc(db, 'music', resolvedParams.id), data);
+        console.log('Music document updated:', resolvedParams.id);
       }
 
+      console.log('Save completed successfully, redirecting...');
       router.push('/admin');
     } catch (error) {
       console.error('Error saving music:', error);
-      alert('保存に失敗しました');
+      const errorMessage = error instanceof Error ? error.message : '不明なエラーが発生しました';
+      alert(`保存に失敗しました: ${errorMessage}`);
     } finally {
       setSaving(false);
       setUploading(false);
@@ -289,7 +338,7 @@ export default function MusicEditPage({ params }: { params: Promise<{ id: string
               </button>
               <button
                 type="submit"
-                disabled={saving}
+                disabled={saving || uploading}
                 className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 disabled:cursor-not-allowed text-white rounded-md transition duration-200"
               >
                 {uploading ? 'アップロード中...' : saving ? '保存中...' : '保存'}
