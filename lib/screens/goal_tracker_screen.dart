@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:table_calendar/table_calendar.dart';
+import '../services/login_history_service.dart';
+import '../services/auth_service.dart';
 
 class GoalTrackerScreen extends StatefulWidget {
   const GoalTrackerScreen({super.key});
@@ -13,17 +15,48 @@ class GoalTrackerScreen extends StatefulWidget {
 class _GoalTrackerScreenState extends State<GoalTrackerScreen> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-
-  // Mock login history - in a real app, this would come from a service
-  final Set<DateTime> _loginDays = {
-    DateTime.now(),
-    DateTime.now().subtract(const Duration(days: 1)),
-    DateTime.now().subtract(const Duration(days: 3)),
-    DateTime.now().subtract(const Duration(days: 5)),
-    DateTime.now().subtract(const Duration(days: 7)),
-    DateTime.now().subtract(const Duration(days: 10)),
-    DateTime.now().subtract(const Duration(days: 14)),
+  
+  final LoginHistoryService _loginHistoryService = LoginHistoryService();
+  final AuthService _authService = AuthService();
+  
+  Set<DateTime> _loginDays = {};
+  Map<String, int> _loginStats = {
+    'totalDays': 0,
+    'thisWeek': 0,
+    'streak': 0,
   };
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLoginHistory();
+  }
+  
+  Future<void> _loadLoginHistory() async {
+    final userId = _authService.currentUserId;
+    if (userId == null) return;
+    
+    try {
+      final loginDays = await _loginHistoryService.getLoginDays(userId);
+      final loginStats = await _loginHistoryService.getLoginStats(userId);
+      
+      if (mounted) {
+        setState(() {
+          _loginDays = loginDays;
+          _loginStats = loginStats;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('Failed to load login history: $e');
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -109,17 +142,17 @@ class _GoalTrackerScreenState extends State<GoalTrackerScreen> {
                     children: [
                       _StatItem(
                         title: 'Total Days',
-                        value: '${_loginDays.length}',
+                        value: _isLoading ? '-' : '${_loginStats['totalDays']}',
                         color: const Color(0xFF4ECDC4),
                       ),
                       _StatItem(
                         title: 'This Week',
-                        value: _getWeeklyCount().toString(),
+                        value: _isLoading ? '-' : '${_loginStats['thisWeek']}',
                         color: const Color(0xFF6BCF7F),
                       ),
                       _StatItem(
                         title: 'Streak',
-                        value: _getCurrentStreak().toString(),
+                        value: _isLoading ? '-' : '${_loginStats['streak']}',
                         color: const Color(0xFFFF6B35),
                       ),
                     ],
@@ -130,17 +163,35 @@ class _GoalTrackerScreenState extends State<GoalTrackerScreen> {
                 
                 // Calendar
                 Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF1A1A1A), Color(0xFF0F0F0F)],
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: const Color(0xFF4ECDC4).withOpacity(0.3),
-                        width: 1,
-                      ),
-                    ),
+                  child: _isLoading
+                    ? Container(
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF1A1A1A), Color(0xFF0F0F0F)],
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: const Color(0xFF4ECDC4).withOpacity(0.3),
+                            width: 1,
+                          ),
+                        ),
+                        child: const Center(
+                          child: CircularProgressIndicator(
+                            color: Color(0xFF4ECDC4),
+                          ),
+                        ),
+                      )
+                    : Container(
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF1A1A1A), Color(0xFF0F0F0F)],
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: const Color(0xFF4ECDC4).withOpacity(0.3),
+                            width: 1,
+                          ),
+                        ),
                     child: TableCalendar<DateTime>(
                       firstDay: DateTime.utc(2024, 1, 1),
                       lastDay: DateTime.utc(2030, 12, 31),
@@ -211,30 +262,6 @@ class _GoalTrackerScreenState extends State<GoalTrackerScreen> {
     );
   }
 
-  int _getWeeklyCount() {
-    final now = DateTime.now();
-    final weekStart = now.subtract(Duration(days: now.weekday - 1));
-    return _loginDays.where((day) => 
-      day.isAfter(weekStart.subtract(const Duration(days: 1))) &&
-      day.isBefore(now.add(const Duration(days: 1)))
-    ).length;
-  }
-
-  int _getCurrentStreak() {
-    final sortedDays = _loginDays.toList()..sort((a, b) => b.compareTo(a));
-    if (sortedDays.isEmpty) return 0;
-    
-    int streak = 1;
-    for (int i = 1; i < sortedDays.length; i++) {
-      final difference = sortedDays[i - 1].difference(sortedDays[i]).inDays;
-      if (difference <= 1) {
-        streak++;
-      } else {
-        break;
-      }
-    }
-    return streak;
-  }
 }
 
 class _StatItem extends StatelessWidget {

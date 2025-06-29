@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import '../models/user_model.dart';
+import 'login_history_service.dart';
 
 class AuthService {
   static final AuthService _instance = AuthService._internal();
@@ -10,6 +11,7 @@ class AuthService {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final LoginHistoryService _loginHistoryService = LoginHistoryService();
 
   // Current user stream
   Stream<User?> get authStateChanges => _auth.authStateChanges();
@@ -35,6 +37,9 @@ class AuthService {
       );
       
       if (credential.user != null) {
+        // Record login history
+        await _loginHistoryService.recordLogin(credential.user!.uid);
+        
         // Get or create user data in Firestore
         return await _getOrCreateUserData(credential.user!);
       }
@@ -65,6 +70,9 @@ class AuthService {
         // Update display name
         await credential.user!.updateDisplayName(displayName);
         
+        // Record login history
+        await _loginHistoryService.recordLogin(credential.user!.uid);
+        
         // Create user data in Firestore
         return await _createUserData(
           user: credential.user!,
@@ -88,6 +96,9 @@ class AuthService {
       final credential = await _auth.signInAnonymously();
       
       if (credential.user != null) {
+        // Record login history
+        await _loginHistoryService.recordLogin(credential.user!.uid);
+        
         // Create guest user data
         return await _createUserData(
           user: credential.user!,

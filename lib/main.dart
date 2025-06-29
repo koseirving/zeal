@@ -13,6 +13,7 @@ import 'services/notification_service.dart';
 import 'services/local_storage_service.dart';
 import 'providers/auth_provider.dart';
 import 'services/auth_service.dart';
+import 'services/login_history_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -59,7 +60,19 @@ void main() async {
   // Initialize anonymous authentication
   try {
     final authService = AuthService();
-    await authService.signInAnonymously();
+    
+    // Check if user is already authenticated
+    if (authService.isAuthenticated) {
+      // Record login history for existing user
+      if (authService.currentUserId != null) {
+        final loginHistoryService = LoginHistoryService();
+        await loginHistoryService.recordLogin(authService.currentUserId!);
+      }
+    } else {
+      // Sign in anonymously (this will also record login history)
+      await authService.signInAnonymously();
+    }
+    
     debugPrint('Anonymous authentication completed');
   } catch (e) {
     debugPrint('Failed to initialize anonymous authentication: $e');

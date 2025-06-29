@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/daily_affirmation_service.dart';
+import '../services/auth_service.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -18,9 +20,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    _checkAuthStatus();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       DailyAffirmationService.showDailyAffirmationDialog(context);
     });
+  }
+  
+  void _checkAuthStatus() {
+    // Optional: Basic auth status logging for development
+    if (kDebugMode) {
+      final authService = AuthService();
+      final user = authService.currentUser;
+      debugPrint('Auth Status: ${authService.isAuthenticated ? "✅" : "❌"} User: ${user?.uid}');
+    }
   }
 
   @override
