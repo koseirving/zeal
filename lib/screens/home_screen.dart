@@ -242,35 +242,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         
                         const SizedBox(height: 32),
 
-                        // Feature Cards Grid
-                        Expanded(
-                          child: GridView.count(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 16,
-                            mainAxisSpacing: 16,
-                            childAspectRatio: 0.85,
-                            children: [
-                              _FeatureCard(
-                                title: 'Motivation Videos',
-                                subtitle: 'Inspiring content',
-                                icon: Icons.play_circle_fill,
-                                color: const Color(
-                                  0xFFFF6B35,
-                                ), // Warm orange - passion
-                                onTap: () => context.go('/content?tab=0'),
-                              ),
-                              _FeatureCard(
-                                title: 'Focus Music',
-                                subtitle: 'Concentration sounds',
-                                icon: Icons.music_note,
-                                color: const Color(
-                                  0xFFFFD93D,
-                                ), // Gold - excellence
-                                onTap: () => context.go('/content?tab=1'),
-                              ),
-                            ],
-                          ),
-                        ),
+                        // Add some extra content or leave empty for now
+                        const Spacer(),
                       ],
                     ),
                   ),
@@ -278,6 +251,104 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ],
           ),
+        ),
+      ),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF1A1A1A),
+              Color(0xFF0A0A0A),
+            ],
+          ),
+          border: Border(
+            top: BorderSide(
+              color: const Color(0xFFFF6B35).withOpacity(0.3),
+              width: 1,
+            ),
+          ),
+        ),
+        child: BottomNavigationBar(
+          currentIndex: 0,
+          onTap: (index) {
+            if (index == 0) {
+              // Already on home screen
+              return;
+            } else if (index == 1) {
+              context.go('/content?tab=0');  // Videos
+            } else if (index == 2) {
+              context.go('/content?tab=1');  // Music
+            } else if (index == 3) {
+              context.go('/content?tab=2');  // Tracker
+            }
+          },
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          type: BottomNavigationBarType.fixed,
+          selectedItemColor: const Color(0xFF6366F1),
+          unselectedItemColor: Colors.white54,
+          selectedLabelStyle: GoogleFonts.crimsonText(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+          ),
+          unselectedLabelStyle: GoogleFonts.crimsonText(
+            fontSize: 12,
+            fontWeight: FontWeight.w400,
+          ),
+          items: [
+            BottomNavigationBarItem(
+              icon: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      const Color(0xFF6366F1).withOpacity(0.3),
+                      const Color(0xFF6366F1).withOpacity(0.1),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: const Color(0xFF6366F1).withOpacity(0.5),
+                    width: 1,
+                  ),
+                ),
+                child: Icon(
+                  Icons.home,
+                  size: 24,
+                  shadows: [
+                    Shadow(
+                      color: const Color(0xFF6366F1).withOpacity(0.6),
+                      blurRadius: 10,
+                    ),
+                  ],
+                ),
+              ),
+              label: 'Home',
+            ),
+            const BottomNavigationBarItem(
+              icon: Icon(
+                Icons.play_circle_fill,
+                size: 24,
+              ),
+              label: 'Videos',
+            ),
+            const BottomNavigationBarItem(
+              icon: Icon(
+                Icons.music_note,
+                size: 24,
+              ),
+              label: 'Music',
+            ),
+            const BottomNavigationBarItem(
+              icon: Icon(
+                Icons.calendar_today,
+                size: 24,
+              ),
+              label: 'Tracker',
+            ),
+          ],
         ),
       ),
     );
