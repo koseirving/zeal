@@ -35,6 +35,15 @@ class MusicModel {
   factory MusicModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     
+    // Handle isActive field - could be boolean, string, or missing
+    bool isActiveValue = true; // default to true
+    final isActiveField = data['isActive'];
+    if (isActiveField is bool) {
+      isActiveValue = isActiveField;
+    } else if (isActiveField is String) {
+      isActiveValue = isActiveField.toLowerCase() == 'true';
+    }
+    
     return MusicModel(
       id: doc.id,
       title: data['title'] ?? '',
@@ -42,13 +51,13 @@ class MusicModel {
       audioUrl: data['audioUrl'] ?? '',
       imageUrl: data['imageUrl'] ?? '',
       category: data['category'] ?? '',
-      duration: data['duration'] ?? 0,
+      duration: (data['duration'] is int) ? data['duration'] : int.tryParse(data['duration']?.toString() ?? '0') ?? 0,
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       updatedAt: (data['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      isActive: data['isActive'] ?? true,
+      isActive: isActiveValue,
       createdBy: data['createdBy'],
       tags: List<String>.from(data['tags'] ?? []),
-      playCount: data['playCount'] ?? 0,
+      playCount: (data['playCount'] is int) ? data['playCount'] : int.tryParse(data['playCount']?.toString() ?? '0') ?? 0,
     );
   }
 

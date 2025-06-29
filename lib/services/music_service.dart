@@ -90,100 +90,24 @@ class MusicService {
     }
     
     // Fallback to mock data if all else fails
-    debugPrint('MusicService: Returning mock data as fallback');
     return _getMockMusic();
   }
 
-  // Get mock music for fallback
+  // Get minimal mock music for emergency fallback only
   List<MusicModel> _getMockMusic() {
+    // Return only a single mock item to indicate the service is working
+    // but database/cache is unavailable
     return [
       MusicModel(
-        id: '1',
-        title: 'Deep Focus Flow',
-        artist: 'Ambient Collective',
-        audioUrl: 'https://www.soundjay.com/misc/sounds/magic-chime-02.wav',
+        id: 'mock_fallback',
+        title: 'サンプル音楽',
+        artist: 'システムサンプル',
+        audioUrl: '',
         imageUrl: '',
-        category: 'Focus',
-        duration: 1800, // 30 minutes
-        createdAt: DateTime.now().subtract(const Duration(days: 1)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 1)),
-      ),
-      MusicModel(
-        id: '2',
-        title: 'Mindful Meditation',
-        artist: 'Zen Masters',
-        audioUrl: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav',
-        imageUrl: '',
-        category: 'Meditation',
-        duration: 2400, // 40 minutes
-        createdAt: DateTime.now().subtract(const Duration(days: 2)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 2)),
-      ),
-      MusicModel(
-        id: '3',
-        title: 'Forest Sounds',
-        artist: 'Nature Audio',
-        audioUrl: 'https://www.soundjay.com/misc/sounds/magic-chime-02.wav',
-        imageUrl: '',
-        category: 'Nature',
-        duration: 3600, // 60 minutes
-        createdAt: DateTime.now().subtract(const Duration(days: 3)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 3)),
-      ),
-      MusicModel(
-        id: '4',
-        title: 'Piano Reflections',
-        artist: 'Solo Piano',
-        audioUrl: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav',
-        imageUrl: '',
-        category: 'Instrumental',
-        duration: 2100, // 35 minutes
-        createdAt: DateTime.now().subtract(const Duration(days: 4)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 4)),
-      ),
-      MusicModel(
-        id: '5',
-        title: 'Ocean Waves',
-        artist: 'Nature Sounds',
-        audioUrl: 'https://www.soundjay.com/misc/sounds/magic-chime-02.wav',
-        imageUrl: '',
-        category: 'Nature',
-        duration: 4800, // 80 minutes
-        createdAt: DateTime.now().subtract(const Duration(days: 5)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 5)),
-      ),
-      MusicModel(
-        id: '6',
-        title: 'Concentration Boost',
-        artist: 'Focus Lab',
-        audioUrl: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav',
-        imageUrl: '',
-        category: 'Focus',
-        duration: 2700, // 45 minutes
-        createdAt: DateTime.now().subtract(const Duration(days: 6)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 6)),
-      ),
-      MusicModel(
-        id: '7',
-        title: 'Ambient Space',
-        artist: 'Cosmic Sounds',
-        audioUrl: 'https://www.soundjay.com/misc/sounds/magic-chime-02.wav',
-        imageUrl: '',
-        category: 'Ambient',
-        duration: 3300, // 55 minutes
-        createdAt: DateTime.now().subtract(const Duration(days: 7)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 7)),
-      ),
-      MusicModel(
-        id: '8',
-        title: 'Gentle Rain',
-        artist: 'Weather Sounds',
-        audioUrl: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav',
-        imageUrl: '',
-        category: 'Nature',
-        duration: 5400, // 90 minutes
-        createdAt: DateTime.now().subtract(const Duration(days: 8)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 8)),
+        category: 'System',
+        duration: 300, // 5 minutes
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
       ),
     ];
   }
