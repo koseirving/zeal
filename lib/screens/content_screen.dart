@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../providers/video_provider.dart';
 import '../providers/music_provider.dart';
 import '../widgets/video_player_widget.dart';
+import '../services/video_service.dart';
 import 'goal_tracker_content.dart';
 import 'music_player_content.dart';
 
@@ -271,65 +272,166 @@ class _VideoContentState extends ConsumerState<_VideoContent> {
     super.dispose();
   }
 
+  Future<void> _refreshVideos() async {
+    await VideoService().refreshVideos();
+    ref.invalidate(videosProvider);
+  }
+
+  void _showDebugInfo() {
+    final cacheInfo = VideoService().getCacheInfo();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1A1A1A),
+        title: const Text(
+          'Video Debug Info',
+          style: TextStyle(color: Colors.white),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Has Cached Videos: ${cacheInfo['hasCachedVideos']}',
+              style: const TextStyle(color: Colors.white70),
+            ),
+            Text(
+              'Cached Video Count: ${cacheInfo['cachedVideoCount']}',
+              style: const TextStyle(color: Colors.white70),
+            ),
+            Text(
+              'Last Cache Update: ${cacheInfo['lastCacheUpdate'] ?? 'Never'}',
+              style: const TextStyle(color: Colors.white70),
+            ),
+            Text(
+              'Cache Age (minutes): ${cacheInfo['cacheAge'] ?? 'N/A'}',
+              style: const TextStyle(color: Colors.white70),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text(
+              'Close',
+              style: TextStyle(color: Color(0xFFFF6B35)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final videosAsync = ref.watch(videosProvider);
 
-    return videosAsync.when(
-      loading: () => const Center(
-        child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF6B35)),
-        ),
-      ),
-      error: (error, stack) => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.error_outline,
-              color: Colors.red,
-              size: 64,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Error loading videos: $error',
-              style: const TextStyle(color: Colors.white70),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-      data: (videos) {
-        if (videos.isEmpty) {
-          return const Center(
-            child: Text(
-              'No videos available',
-              style: TextStyle(
-                color: Colors.white70,
-                fontSize: 18,
+    return Stack(
+      children: [
+        RefreshIndicator(
+          onRefresh: _refreshVideos,
+          color: const Color(0xFFFF6B35),
+          backgroundColor: const Color(0xFF1A1A1A),
+          child: videosAsync.when(
+            loading: () => const Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF6B35)),
               ),
             ),
-          );
-        }
+            error: (error, stack) => Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.error_outline,
+                    color: Colors.red,
+                    size: 64,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Error loading videos: $error',
+                    style: const TextStyle(color: Colors.white70),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: _refreshVideos,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFFF6B35),
+                    ),
+                    child: const Text(
+                      'Retry',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            data: (videos) {
+              if (videos.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'No videos available',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 18,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: _refreshVideos,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFFF6B35),
+                        ),
+                        child: const Text(
+                          'Refresh',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
 
-        return PageView.builder(
-          controller: _pageController,
-          scrollDirection: Axis.vertical,
-          onPageChanged: (index) {
-            setState(() {
-              _currentIndex = index;
-            });
-          },
-          itemCount: videos.length,
-          itemBuilder: (context, index) {
-            final video = videos[index];
-            return VideoPlayerWidget(
-              video: video,
-              isActive: index == _currentIndex,
-            );
-          },
-        );
-      },
+              return PageView.builder(
+                controller: _pageController,
+                scrollDirection: Axis.vertical,
+                onPageChanged: (index) {
+                  setState(() {
+                    _currentIndex = index;
+                  });
+                },
+                itemCount: videos.length,
+                itemBuilder: (context, index) {
+                  final video = videos[index];
+                  return VideoPlayerWidget(
+                    video: video,
+                    isActive: index == _currentIndex,
+                  );
+                },
+              );
+            },
+          ),
+        ),
+        // Debug button in top-right corner
+        Positioned(
+          top: 50,
+          right: 16,
+          child: FloatingActionButton(
+            mini: true,
+            backgroundColor: const Color(0xFF6366F1).withOpacity(0.8),
+            onPressed: _showDebugInfo,
+            child: const Icon(
+              Icons.bug_report,
+              color: Colors.white,
+              size: 16,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

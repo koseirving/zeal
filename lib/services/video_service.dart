@@ -52,13 +52,17 @@ class VideoService {
       final querySnapshot = await _firestore
           .collection('videos')
           .where('isActive', isEqualTo: true)
-          .orderBy('createdAt', descending: true)
           .get()
           .timeout(const Duration(seconds: 10));
       
-      return querySnapshot.docs
+      final videos = querySnapshot.docs
           .map((doc) => VideoModel.fromFirestore(doc))
           .toList();
+      
+      // Sort by createdAt in memory since we can't use orderBy without index
+      videos.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      
+      return videos;
           
     } catch (e) {
       debugPrint('VideoService: Firestore error: $e');
@@ -101,7 +105,7 @@ class VideoService {
         id: '1',
         title: 'Never Give Up - Motivational Speech',
         description: 'A powerful speech about perseverance and achieving your dreams. Learn how to push through challenges and never give up on your goals.',
-        videoUrl: 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4',
+        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
         thumbnailUrl: 'https://via.placeholder.com/300x400/6366F1/FFFFFF?text=Never+Give+Up',
         category: 'Motivation',
         likes: 1240,
@@ -113,7 +117,7 @@ class VideoService {
         id: '2',
         title: 'Success Mindset - Daily Habits',
         description: 'Discover the daily habits that successful people practice every day. Transform your mindset and achieve extraordinary results.',
-        videoUrl: 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_2mb.mp4',
+        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
         thumbnailUrl: 'https://via.placeholder.com/300x400/8B5CF6/FFFFFF?text=Success+Mindset',
         category: 'Success',
         likes: 890,
@@ -125,7 +129,7 @@ class VideoService {
         id: '3',
         title: 'Overcome Fear - Face Your Challenges',
         description: 'Learn how to overcome fear and step out of your comfort zone. Build confidence and tackle any challenge that comes your way.',
-        videoUrl: 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_5mb.mp4',
+        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
         thumbnailUrl: 'https://via.placeholder.com/300x400/A855F7/FFFFFF?text=Overcome+Fear',
         category: 'Personal Growth',
         likes: 567,
@@ -137,7 +141,7 @@ class VideoService {
         id: '4',
         title: 'Dream Big - Visualization Techniques',
         description: 'Master the art of visualization to manifest your dreams. Learn powerful techniques used by top performers worldwide.',
-        videoUrl: 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4',
+        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
         thumbnailUrl: 'https://via.placeholder.com/300x400/06B6D4/FFFFFF?text=Dream+Big',
         category: 'Visualization',
         likes: 2100,
@@ -149,7 +153,7 @@ class VideoService {
         id: '5',
         title: 'Morning Motivation - Start Strong',
         description: 'Energize your mornings with this powerful motivational message. Set the tone for a productive and successful day.',
-        videoUrl: 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_2mb.mp4',
+        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
         thumbnailUrl: 'https://via.placeholder.com/300x400/F59E0B/FFFFFF?text=Morning+Power',
         category: 'Morning Motivation',
         likes: 1780,
