@@ -105,6 +105,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+    - assets/common/
     - assets/solfeggio/174hz/
     - assets/solfeggio/285hz/
     - assets/solfeggio/396hz/

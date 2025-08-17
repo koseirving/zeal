@@ -3,6 +3,7 @@ import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
 import '../models/video_model.dart';
 import '../services/video_service.dart';
+import '../services/video_player_manager.dart';
 
 class VideoPlayerWidget extends StatefulWidget {
   final VideoModel video;
@@ -24,27 +25,35 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   bool _hasError = false;
   String? _errorMessage;
   bool _isLoading = false;
+  bool _isBuffering = false;
+  
+  final VideoPlayerManager _playerManager = VideoPlayerManager();
 
   @override
   void initState() {
     super.initState();
-    if (widget.isActive) {
-      _initializeVideo();
-    }
+    _loadVideo();
   }
 
   @override
   void didUpdateWidget(VideoPlayerWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     
-    if (widget.isActive && !oldWidget.isActive) {
-      _initializeVideo();
-    } else if (!widget.isActive && oldWidget.isActive) {
-      _disposeVideo();
+    // 動画が変わった場合は完全に再読み込み
+    if (widget.video.id != oldWidget.video.id) {
+      _loadVideo();
+    }
+    // アクティブ状態のみが変わった場合は再生/停止制御のみ
+    else if (widget.isActive != oldWidget.isActive) {
+      if (widget.isActive) {
+        _activateVideo();
+      } else {
+        _deactivateVideo();
+      }
     }
   }
 
-  Future<void> _initializeVideo() async {
+  Future<void> _loadVideo() async {
     try {
       setState(() {
         _hasError = false;
@@ -52,53 +61,31 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
         _isLoading = true;
       });
 
-      // Validate URL
-      if (widget.video.videoUrl.isEmpty) {
-        throw Exception('Video URL is empty');
+      // マネージャーから VideoPlayerController を取得
+      final controller = await _playerManager.getController(widget.video);
+      
+      if (controller == null) {
+        throw Exception('Failed to get video controller');
       }
 
-      Uri videoUri;
-      try {
-        videoUri = Uri.parse(widget.video.videoUrl);
-      } catch (e) {
-        throw Exception('Invalid video URL format: ${widget.video.videoUrl}');
+      // 既存のChewieControllerを破棄（動画が変わる場合のみ）
+      _chewieController?.dispose();
+      _chewieController = null;
+
+      // 新しいControllerを設定
+      _videoPlayerController = controller;
+      _videoPlayerController!.addListener(_videoPlayerListener);
+
+      // ChewieControllerを作成
+      if (mounted) {
+        _createChewieController();
+        setState(() {
+          _isLoading = false;
+        });
       }
-
-      _videoPlayerController = VideoPlayerController.networkUrl(videoUri);
-
-      await _videoPlayerController!.initialize();
-
-      // Check if the video has valid dimensions
-      if (_videoPlayerController!.value.size.width == 0 || 
-          _videoPlayerController!.value.size.height == 0) {
-        throw Exception('Video has invalid dimensions');
-      }
-
-      _chewieController = ChewieController(
-        videoPlayerController: _videoPlayerController!,
-        aspectRatio: 9 / 16, // Vertical video ratio like TikTok
-        autoPlay: true,
-        looping: true,
-        showControls: true,
-        showControlsOnInitialize: false,
-        controlsSafeAreaMinimum: const EdgeInsets.all(12),
-        materialProgressColors: ChewieProgressColors(
-          playedColor: const Color(0xFF6366F1),
-          handleColor: const Color(0xFF6366F1),
-          backgroundColor: Colors.white30,
-          bufferedColor: Colors.white60,
-        ),
-      );
-
-      // Track video view
-      VideoService().incrementViews(widget.video.id);
-
-      setState(() {
-        _isLoading = false;
-      });
 
     } catch (e) {
-      debugPrint('VideoPlayerWidget: Error initializing video: $e');
+      debugPrint('VideoPlayerWidget: Error loading video ${widget.video.id}: $e');
       
       setState(() {
         _hasError = true;
@@ -108,11 +95,124 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     }
   }
 
+  // アクティブ化：既存のChewieControllerで再生開始
+  void _activateVideo() {
+    if (_chewieController != null && _videoPlayerController != null) {
+      // ChewieControllerで再生開始
+      _chewieController!.play();
+      
+      // VideoPlayerControllerでも再生開始（確実性のため）
+      _videoPlayerController!.play();
+      
+      // ビュー数カウント
+      VideoService().incrementViews(widget.video.id);
+      
+      debugPrint('VideoPlayerWidget: ▶️ Activated video ${widget.video.id}');
+    } else {
+      // ChewieControllerが未作成の場合は新規作成
+      debugPrint('VideoPlayerWidget: No controller found, loading video ${widget.video.id}');
+      _loadVideo();
+    }
+  }
+
+  // 非アクティブ化：確実に停止
+  void _deactivateVideo() {
+    // ChewieControllerで停止
+    if (_chewieController != null) {
+      _chewieController!.pause();
+    }
+    
+    // VideoPlayerControllerでも停止（確実性のため）
+    if (_videoPlayerController != null) {
+      _videoPlayerController!.pause();
+    }
+    
+    debugPrint('VideoPlayerWidget: ⏸️ Deactivated video ${widget.video.id}');
+  }
+
+  void _videoPlayerListener() {
+    if (_videoPlayerController == null || !mounted) return;
+
+    final value = _videoPlayerController!.value;
+    
+    // バッファリング状態の監視
+    final isBuffering = value.isBuffering;
+    if (_isBuffering != isBuffering && mounted) {
+      setState(() {
+        _isBuffering = isBuffering;
+      });
+    }
+
+    // エラー状態の監視
+    if (value.hasError && mounted && !_hasError) {
+      final error = value.errorDescription;
+      debugPrint('VideoPlayerWidget: Player error detected: $error');
+      
+      setState(() {
+        _hasError = true;
+        _errorMessage = 'Failed to load video';
+      });
+    }
+  }
+
+
+  void _createChewieController() {
+    if (_videoPlayerController == null || !mounted || _chewieController != null) return;
+
+    _chewieController = ChewieController(
+      videoPlayerController: _videoPlayerController!,
+      aspectRatio: 9 / 16,
+      autoPlay: widget.isActive, // アクティブな場合のみ自動再生
+      looping: true,
+      showControls: true,
+      showControlsOnInitialize: false,
+      controlsSafeAreaMinimum: const EdgeInsets.all(12),
+      allowMuting: true,
+      allowPlaybackSpeedChanging: false,
+      allowFullScreen: false,
+      startAt: Duration.zero,
+      autoInitialize: false, // 手動初期化済み
+      placeholder: Container(
+        color: Colors.black,
+        child: const Center(
+          child: CircularProgressIndicator(
+            color: Color(0xFF6366F1),
+            strokeWidth: 2,
+          ),
+        ),
+      ),
+      materialProgressColors: ChewieProgressColors(
+        playedColor: const Color(0xFF6366F1),
+        handleColor: const Color(0xFF6366F1),
+        backgroundColor: Colors.white30,
+        bufferedColor: Colors.white60,
+      ),
+    );
+
+    // アクティブな動画のみビュー数をカウント
+    if (widget.isActive) {
+      VideoService().incrementViews(widget.video.id);
+    }
+  }
+
   void _disposeVideo() {
-    _chewieController?.dispose();
-    _videoPlayerController?.dispose();
-    _chewieController = null;
-    _videoPlayerController = null;
+    // 確実に停止してから破棄
+    if (_chewieController != null) {
+      _chewieController!.pause();
+      _chewieController!.dispose();
+      _chewieController = null;
+    }
+    
+    if (_videoPlayerController != null) {
+      _videoPlayerController!.pause();
+      _videoPlayerController!.removeListener(_videoPlayerListener);
+      _videoPlayerController = null;
+    }
+    
+    // ウィジェット破棄時はsetState()を呼び出さない
+    _isBuffering = false;
+    
+    debugPrint('VideoPlayerWidget: 🗑️ Disposed video ${widget.video.id}');
   }
 
   @override
@@ -125,7 +225,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        // Video Player
+        // Video Player - ChewieControllerが存在し、エラーがない場合のみ表示
         if (_chewieController != null && !_hasError)
           SizedBox.expand(
             child: FittedBox(
@@ -134,6 +234,30 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                 width: _videoPlayerController!.value.size.width,
                 height: _videoPlayerController!.value.size.height,
                 child: Chewie(controller: _chewieController!),
+              ),
+            ),
+          ),
+
+        // ローディング中
+        if (_isLoading && !_hasError)
+          Container(
+            color: Colors.black,
+            child: const Center(
+              child: CircularProgressIndicator(
+                color: Color(0xFF6366F1),
+                strokeWidth: 2,
+              ),
+            ),
+          ),
+
+        // 再生中のバッファリングインジケーター
+        if (_isBuffering && _chewieController != null && !_hasError)
+          Container(
+            color: Colors.black26,
+            child: const Center(
+              child: CircularProgressIndicator(
+                color: Color(0xFF6366F1),
+                strokeWidth: 2,
               ),
             ),
           )
@@ -182,7 +306,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                     ],
                     const SizedBox(height: 16),
                     ElevatedButton.icon(
-                      onPressed: _initializeVideo,
+                      onPressed: () => _loadVideo(),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF6366F1),
                       ),
@@ -201,37 +325,6 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
               ),
             ),
           )
-        else
-          Container(
-            color: Colors.black,
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const CircularProgressIndicator(
-                    color: Color(0xFF6366F1),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    _isLoading ? 'Loading video...' : 'Preparing video...',
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    widget.video.title,
-                    style: const TextStyle(
-                      color: Colors.white54,
-                      fontSize: 12,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-          ),
 
       ],
     );

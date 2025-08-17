@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/video_provider.dart';
 import '../widgets/video_player_widget.dart';
+import '../services/video_player_manager.dart';
+import '../models/video_model.dart';
 
 class VideoTimelineScreen extends ConsumerStatefulWidget {
   const VideoTimelineScreen({super.key});
@@ -14,11 +16,97 @@ class VideoTimelineScreen extends ConsumerStatefulWidget {
 class _VideoTimelineScreenState extends ConsumerState<VideoTimelineScreen> {
   late PageController _pageController;
   int _currentIndex = 0;
+  bool _hasPreloadedInitial = false;
+  bool _hasStartedWatching = false; // 視聴開始フラグ
+  
+  final VideoPlayerManager _playerManager = VideoPlayerManager();
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController();
+    
+    // 1動画目の優先事前ロードを実行
+    _prioritizeFirstVideo();
+  }
+
+  // 1動画目の最優先事前ロード
+  Future<void> _prioritizeFirstVideo() async {
+    try {
+      // videosProviderからデータを取得
+      ref.read(videosProvider.future).then((videos) async {
+        if (videos.isNotEmpty && mounted) {
+          debugPrint('VideoTimelineScreen: Starting priority preload for first video');
+          
+          // 1動画目を最優先で事前ロード
+          final success = await _playerManager.preloadVideo(videos[0]);
+          
+          if (success && mounted) {
+            debugPrint('VideoTimelineScreen: Priority preload completed for first video');
+            
+            // 1動画目完了後、残りの動画も事前ロード
+            if (videos.length > 1) {
+              final remainingVideos = videos.skip(1).take(2).cast<VideoModel>().toList();
+              _playerManager.preloadVideos(remainingVideos);
+            }
+            
+            setState(() {
+              _hasPreloadedInitial = true;
+            });
+          }
+        }
+      }).catchError((error) {
+        debugPrint('VideoTimelineScreen: Priority preload error: $error');
+      });
+    } catch (e) {
+      debugPrint('VideoTimelineScreen: Error in priority preload: $e');
+    }
+  }
+
+  void _triggerAdditionalPreload(List<dynamic> videos, int currentIndex) {
+    // バックグラウンドで次の動画を事前ロード
+    _preloadNextVideos(videos, currentIndex);
+  }
+  
+  // 積極的事前ロード処理
+  Future<void> _preloadNextVideos(List<dynamic> videos, int currentIndex) async {
+    // 次の2本を事前ロード（非同期でユーザー操作をブロックしない）
+    final List<int> indicesToPreload = [];
+    
+    // 次の動画を優先
+    for (int i = currentIndex + 1; i <= currentIndex + 2 && i < videos.length; i++) {
+      indicesToPreload.add(i);
+    }
+    
+    // 前の動画も1本追加
+    if (currentIndex > 0) {
+      indicesToPreload.add(currentIndex - 1);
+    }
+    
+    // バックグラウンドで事前ロード実行
+    for (final index in indicesToPreload) {
+      if (index >= 0 && index < videos.length) {
+        _playerManager.preloadVideo(videos[index]).catchError((error) {
+          debugPrint('VideoTimelineScreen: Preload error for video $index: $error');
+          return false;
+        });
+      }
+    }
+  }
+  
+  // 初回ロード時の事前ロード
+  Future<void> _initialPreload(List<dynamic> videos) async {
+    if (_hasPreloadedInitial || videos.isEmpty) return;
+    
+    // 最初の3本を事前ロード
+    final videosToPreload = videos.take(3).cast<VideoModel>().toList();
+    await _playerManager.preloadVideos(videosToPreload);
+    
+    setState(() {
+      _hasPreloadedInitial = true;
+    });
+    
+    debugPrint('VideoTimelineScreen: Initial preload completed for ${videosToPreload.length} videos');
   }
 
   @override
@@ -92,6 +180,11 @@ class _VideoTimelineScreenState extends ConsumerState<VideoTimelineScreen> {
             );
           }
 
+          // 優先事前ロードが未完了の場合のみフォールバック実行
+          if (!_hasPreloadedInitial) {
+            _initialPreload(videos);
+          }
+
           return PageView.builder(
             controller: _pageController,
             itemCount: videos.length,
@@ -99,10 +192,20 @@ class _VideoTimelineScreenState extends ConsumerState<VideoTimelineScreen> {
             onPageChanged: (index) {
               setState(() {
                 _currentIndex = index;
+                // 初回スワイプ時に視聴開始フラグを立てる
+                if (!_hasStartedWatching) {
+                  _hasStartedWatching = true;
+                }
               });
+              
+              // バックグラウンド継続事前ロード: ページ変更時に追加の事前ロードをトリガー
+              _triggerAdditionalPreload(videos, index);
             },
             itemBuilder: (context, index) {
               final video = videos[index];
+              
+              // すべての事前ロードはマネージャーが管理するため、
+              // shouldPreloadは不要（VideoPlayerWidgetから削除予定）
               return VideoPlayerWidget(
                 video: video,
                 isActive: index == _currentIndex,
