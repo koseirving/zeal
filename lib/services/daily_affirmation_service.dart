@@ -12,16 +12,20 @@ class DailyAffirmationService {
   static Future<bool> shouldShowDailyAffirmation() async {
     try {
       await _storage.initialize();
-      
+
       final lastShownDate = await _storage.getString(_lastShownDateKey);
       final today = DateTime.now().toIso8601String().split('T')[0];
 
       final shouldShow = lastShownDate != today;
-      debugPrint('DailyAffirmationService: Should show affirmation: $shouldShow (last: $lastShownDate, today: $today)');
-      
+      debugPrint(
+        'DailyAffirmationService: Should show affirmation: $shouldShow (last: $lastShownDate, today: $today)',
+      );
+
       return shouldShow;
     } catch (e) {
-      debugPrint('DailyAffirmationService: Error checking affirmation show status: $e');
+      debugPrint(
+        'DailyAffirmationService: Error checking affirmation show status: $e',
+      );
       // If storage fails, show the dialog (fail-safe)
       return true;
     }
@@ -30,17 +34,23 @@ class DailyAffirmationService {
   static Future<void> markAffirmationShown() async {
     try {
       await _storage.initialize();
-      
+
       final today = DateTime.now().toIso8601String().split('T')[0];
       final success = await _storage.setString(_lastShownDateKey, today);
-      
+
       if (success) {
-        debugPrint('DailyAffirmationService: Affirmation shown date saved successfully (${_storage.storageType})');
+        debugPrint(
+          'DailyAffirmationService: Affirmation shown date saved successfully (${_storage.storageType})',
+        );
       } else {
-        debugPrint('DailyAffirmationService: Failed to save affirmation shown date');
+        debugPrint(
+          'DailyAffirmationService: Failed to save affirmation shown date',
+        );
       }
     } catch (e) {
-      debugPrint('DailyAffirmationService: Failed to save affirmation shown date: $e');
+      debugPrint(
+        'DailyAffirmationService: Failed to save affirmation shown date: $e',
+      );
     }
   }
 
@@ -110,30 +120,6 @@ class _DailyAffirmationDialog extends StatelessWidget {
                 letterSpacing: 1,
               ),
               textAlign: TextAlign.center,
-            ),
-
-            const SizedBox(height: 8),
-
-            // Category badge
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              decoration: BoxDecoration(
-                color: const Color(0xFF6BCF7F).withOpacity(0.2),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: const Color(0xFF6BCF7F).withOpacity(0.3),
-                  width: 1,
-                ),
-              ),
-              child: Text(
-                affirmation.category.toUpperCase(),
-                style: const TextStyle(
-                  color: Color(0xFF6BCF7F),
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 1,
-                ),
-              ),
             ),
 
             const SizedBox(height: 20),
