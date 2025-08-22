@@ -16,11 +16,17 @@ class FeedbackDialog {
     await showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {
         // Auto dismiss after duration
         Future.delayed(duration, () {
-          if (Navigator.canPop(context)) {
-            Navigator.pop(context);
+          // Check if the dialog context is still valid before trying to pop
+          try {
+            if (Navigator.of(dialogContext, rootNavigator: true).canPop()) {
+              Navigator.of(dialogContext, rootNavigator: true).pop();
+            }
+          } catch (e) {
+            // Context is no longer valid, dialog was already dismissed
+            debugPrint('Dialog already dismissed or context invalid');
           }
         });
         
