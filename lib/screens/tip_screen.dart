@@ -17,6 +17,7 @@ class _TipScreenState extends State<TipScreen> {
   int selectedAmount = 100;
   final TipPurchaseService _purchaseService = TipPurchaseService();
   bool _isLoading = false;
+  bool _isJapanese = false;
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +37,7 @@ class _TipScreenState extends State<TipScreen> {
           },
         ),
         title: Text(
-          'Support for ZEAL',
+          _isJapanese ? 'ZEALへのサポート' : 'Support for ZEAL',
           style: GoogleFonts.crimsonText(
             fontSize: 24,
             fontWeight: FontWeight.w600,
@@ -44,6 +45,83 @@ class _TipScreenState extends State<TipScreen> {
           ),
         ),
         centerTitle: true,
+        actions: [
+          // Language Toggle Button
+          Container(
+            margin: const EdgeInsets.only(right: 16),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.2),
+                width: 1,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _isJapanese = false;
+                    });
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: !_isJapanese
+                          ? const Color(0xFFFF6B35)
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    child: Text(
+                      'EN',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: !_isJapanese
+                            ? Colors.white
+                            : Colors.white.withValues(alpha: 0.6),
+                      ),
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _isJapanese = true;
+                    });
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: _isJapanese
+                          ? const Color(0xFFFF6B35)
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    child: Text(
+                      'JP',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: _isJapanese
+                            ? Colors.white
+                            : Colors.white.withValues(alpha: 0.6),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
       body: Container(
         decoration: const BoxDecoration(
@@ -93,7 +171,7 @@ class _TipScreenState extends State<TipScreen> {
                   
                   // Title
                   Text(
-                    'Celebrate Your Wins',
+                    _isJapanese ? '成功を祝おう' : 'Celebrate Your Wins',
                     style: GoogleFonts.crimsonText(
                       fontSize: 32,
                       fontWeight: FontWeight.w600,
@@ -107,7 +185,9 @@ class _TipScreenState extends State<TipScreen> {
                   
                   // Subtitle
                   Text(
-                    'When your dreams start coming true,\nshare your success with us',
+                    _isJapanese 
+                        ? '夢が実現し始めたとき、\nあなたの成功を私たちと分かち合ってください'
+                        : 'When your dreams start coming true,\nshare your success with us',
                     style: const TextStyle(
                       color: Colors.white70,
                       fontSize: 18,
@@ -120,7 +200,7 @@ class _TipScreenState extends State<TipScreen> {
                   
                   // Amount Selection
                   Text(
-                    'Celebrate with us',
+                    _isJapanese ? '一緒に祝いましょう' : 'Celebrate with us',
                     style: GoogleFonts.crimsonText(
                       fontSize: 20,
                       fontWeight: FontWeight.w500,
@@ -188,9 +268,11 @@ class _TipScreenState extends State<TipScreen> {
                         width: 1,
                       ),
                     ),
-                    child: const Text(
-                      'Every step forward, every breakthrough, every dream realized - we want to celebrate with you. Your success story inspires the next dreamer.',
-                      style: TextStyle(
+                    child: Text(
+                      _isJapanese 
+                          ? '一歩一歩の前進、すべてのブレークスルー、実現したすべての夢 - 私たちはあなたと共に祝いたいのです。あなたの成功物語が次の夢見る人を勇気づけます。'
+                          : 'Every step forward, every breakthrough, every dream realized - we want to celebrate with you. Your success story inspires the next dreamer.',
+                      style: const TextStyle(
                         color: Colors.white60,
                         fontSize: 14,
                         height: 1.4,
@@ -223,9 +305,9 @@ class _TipScreenState extends State<TipScreen> {
                               ),
                             ),
                           ),
-                          child: const Text(
-                            'Not Now',
-                            style: TextStyle(
+                          child: Text(
+                            _isJapanese ? '今はしない' : 'Not Now',
+                            style: const TextStyle(
                               color: Colors.white60,
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
@@ -275,7 +357,7 @@ class _TipScreenState extends State<TipScreen> {
     final cooldownSeconds = _purchaseService.remainingCooldownSeconds;
     if (cooldownSeconds > 0) {
       return Text(
-        'Wait ${cooldownSeconds}s',
+        _isJapanese ? '${cooldownSeconds}秒待ってください' : 'Wait ${cooldownSeconds}s',
         style: const TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w600,
@@ -283,7 +365,7 @@ class _TipScreenState extends State<TipScreen> {
       );
     }
     return Text(
-      'Celebrate ¥$selectedAmount',
+      _isJapanese ? '¥$selectedAmountで祝う' : 'Celebrate ¥$selectedAmount',
       style: const TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w600,
