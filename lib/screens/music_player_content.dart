@@ -28,7 +28,8 @@ class _MusicPlayerContentState extends ConsumerState<MusicPlayerContent>
 
     final selectedMode = _modes[_tabController.index];
     ref.read(solfeggioModeProvider.notifier).state = selectedMode;
-    ref.read(solfeggioPlayerProvider.notifier).startMode(selectedMode);
+    // タブ切り替え時に現在の音楽を停止して初期化
+    ref.read(solfeggioPlayerProvider.notifier).stop();
   }
 
   @override
