@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/daily_affirmation_service.dart';
 import '../services/auth_service.dart';
+import '../services/usage_stats_service.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -14,18 +15,42 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  // Mock data for community support
-  final int _totalInvestors = 1247;
-  
+  final UsageStatsService _usageStatsService = UsageStatsService();
+  final AuthService _authService = AuthService();
+  Map<String, int> _userStats = {
+    'totalFocusMinutes': 0,
+    'totalDays': 0,
+  };
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkAuthStatus();
+      _loadUserStats();
       DailyAffirmationService.showDailyAffirmationDialog(context);
     });
   }
-  
+
+  Future<void> _loadUserStats() async {
+    final userId = _authService.currentUserId;
+    if (userId == null) return;
+
+    try {
+      final stats = await _usageStatsService.getUserStats(userId);
+      if (mounted) {
+        setState(() {
+          _userStats = stats;
+        });
+      }
+
+      // Record daily usage
+      await _usageStatsService.recordDailyUsage(userId);
+    } catch (e) {
+      debugPrint('Failed to load user stats: $e');
+    }
+  }
+
   void _checkAuthStatus() {
     // Authentication is handled in main.dart during app initialization
   }
@@ -135,7 +160,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.all(24.0),
+                    padding: const EdgeInsets.all(20.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -161,10 +186,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ),
                         const SizedBox(height: 32),
 
-                        // Community Investment Banner
+                        // User Journey Banner
                         Container(
                           width: double.infinity,
-                          padding: const EdgeInsets.all(20),
+                          padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
                               colors: [Color(0xFFFF6B35), Color(0xFFFFD93D)],
@@ -200,54 +225,90 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      '$_totalInvestors winners',
+                                      'Your Momentum',
                                       style: GoogleFonts.crimsonText(
-                                        fontSize: 24,
+                                        fontSize: 20,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
                                       ),
                                     ),
-                                    const Text(
-                                      'celebrated their success',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
+                                    Text.rich(
+                                      TextSpan(
+                                        children: [
+                                          TextSpan(
+                                            text: '${_userStats['totalDays']}',
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          const TextSpan(
+                                            text: ' days | ',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                          TextSpan(
+                                            text: '${_usageStatsService.minutesToHours(_userStats['totalFocusMinutes'] ?? 0)}',
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          const TextSpan(
+                                            text: ' hours focused',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ],
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () => context.go('/tip'),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 8,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.2),
-                                    borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(
-                                      color: Colors.white.withOpacity(0.3),
-                                      width: 1,
-                                    ),
-                                  ),
-                                  child: const Text(
-                                    'Join them',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
                                 ),
                               ),
                             ],
                           ),
                         ),
                         
-                        const SizedBox(height: 32),
+                        const SizedBox(height: 16),
+                        
+                        // Support ZEAL Button
+                        Center(
+                          child: GestureDetector(
+                            onTap: () => context.go('/tip'),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 12,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.3),
+                                  width: 1,
+                                ),
+                              ),
+                              child: const Text(
+                                'Support ZEAL',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 24),
 
                         // Add some extra content or leave empty for now
                         const Spacer(),

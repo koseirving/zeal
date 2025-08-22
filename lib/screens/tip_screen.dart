@@ -5,6 +5,8 @@ import '../services/tip_purchase_service.dart';
 import '../models/tip_product_model.dart';
 import '../widgets/feedback_dialog.dart';
 import '../utils/error_messages.dart';
+import '../services/usage_stats_service.dart';
+import '../services/auth_service.dart';
 
 class TipScreen extends StatefulWidget {
   const TipScreen({super.key});
@@ -14,10 +16,37 @@ class TipScreen extends StatefulWidget {
 }
 
 class _TipScreenState extends State<TipScreen> {
-  int selectedAmount = 100;
   final TipPurchaseService _purchaseService = TipPurchaseService();
+  final UsageStatsService _usageStatsService = UsageStatsService();
+  final AuthService _authService = AuthService();
   bool _isLoading = false;
   bool _isJapanese = false;
+  Map<String, int> _userStats = {
+    'totalFocusMinutes': 0,
+    'totalDays': 0,
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserStats();
+  }
+
+  Future<void> _loadUserStats() async {
+    final userId = _authService.currentUserId;
+    if (userId == null) return;
+
+    try {
+      final stats = await _usageStatsService.getUserStats(userId);
+      if (mounted) {
+        setState(() {
+          _userStats = stats;
+        });
+      }
+    } catch (e) {
+      debugPrint('Failed to load user stats: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +66,7 @@ class _TipScreenState extends State<TipScreen> {
           },
         ),
         title: Text(
-          _isJapanese ? 'ZEALへのサポート' : 'Support for ZEAL',
+          _isJapanese ? 'ZEALを支援する' : 'Support ZEAL',
           style: GoogleFonts.crimsonText(
             fontSize: 24,
             fontWeight: FontWeight.w600,
@@ -142,8 +171,8 @@ class _TipScreenState extends State<TipScreen> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  const SizedBox(height: 40),
-                  
+                  const SizedBox(height: 20),
+
                   // Header Icon
                   Container(
                     padding: const EdgeInsets.all(20),
@@ -166,28 +195,104 @@ class _TipScreenState extends State<TipScreen> {
                       size: 48,
                     ),
                   ),
-                  
+
+                  const SizedBox(height: 24),
+
+                  // User Stats
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1A1A1A).withOpacity(0.5),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: const Color(0xFFFF6B35).withOpacity(0.2),
+                        width: 1,
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          _isJapanese ? 'ZEALと刻んだ、夢への軌跡' : 'Your Path, Forged with ZEAL',
+                          style: GoogleFonts.crimsonText(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white70,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Column(
+                              children: [
+                                Text(
+                                  '${_userStats['totalDays']}',
+                                  style: GoogleFonts.crimsonText(
+                                    fontSize: 32,
+                                    fontWeight: FontWeight.bold,
+                                    color: const Color(0xFFFF6B35),
+                                  ),
+                                ),
+                                Text(
+                                  _isJapanese ? '日' : 'Day',
+                                  style: const TextStyle(
+                                    color: Colors.white60,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Container(
+                              width: 1,
+                              height: 40,
+                              color: Colors.white24,
+                            ),
+                            Column(
+                              children: [
+                                Text(
+                                  '${_usageStatsService.minutesToHours(_userStats['totalFocusMinutes'] ?? 0)}',
+                                  style: GoogleFonts.crimsonText(
+                                    fontSize: 32,
+                                    fontWeight: FontWeight.bold,
+                                    color: const Color(0xFF4ECDC4),
+                                  ),
+                                ),
+                                Text(
+                                  _isJapanese ? '時間の集中' : 'Time In Focus',
+                                  style: const TextStyle(
+                                    color: Colors.white60,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
                   const SizedBox(height: 32),
-                  
+
                   // Title
                   Text(
-                    _isJapanese ? '成功を祝おう' : 'Celebrate Your Wins',
+                    _isJapanese ? '共に夢を追いかけ続けよう' : "Let's Pursue The Dream, Together.",
                     style: GoogleFonts.crimsonText(
-                      fontSize: 32,
+                      fontSize: 24,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
                       letterSpacing: 1,
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   // Subtitle
                   Text(
-                    _isJapanese 
-                        ? '夢が実現し始めたとき、\nあなたの成功を私たちと分かち合ってください'
-                        : 'When your dreams start coming true,\nshare your success with us',
+                    _isJapanese
+                        ? 'ZEALがあなたの夢の実現を支援し、\nあなたの支援がZEALを維持する'
+                        : 'ZEAL supports your dream.\nYour support sustains ZEAL.',
                     style: const TextStyle(
                       color: Colors.white70,
                       fontSize: 18,
@@ -195,94 +300,9 @@ class _TipScreenState extends State<TipScreen> {
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  
-                  const SizedBox(height: 48),
-                  
-                  // Amount Selection
-                  Text(
-                    _isJapanese ? '一緒に祝いましょう' : 'Celebrate with us',
-                    style: GoogleFonts.crimsonText(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white,
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 24),
-                  
-                  // Amount Buttons Grid
-                  Column(
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _TipAmountCard(
-                              amount: 100,
-                              isSelected: selectedAmount == 100,
-                              onTap: () => setState(() => selectedAmount = 100),
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: _TipAmountCard(
-                              amount: 300,
-                              isSelected: selectedAmount == 300,
-                              onTap: () => setState(() => selectedAmount = 300),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _TipAmountCard(
-                              amount: 500,
-                              isSelected: selectedAmount == 500,
-                              onTap: () => setState(() => selectedAmount = 500),
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: _TipAmountCard(
-                              amount: 1000,
-                              isSelected: selectedAmount == 1000,
-                              onTap: () => setState(() => selectedAmount = 1000),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  
-                  const SizedBox(height: 48),
-                  
-                  // Disclaimer
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF1A1A1A).withOpacity(0.5),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: const Color(0xFF4ECDC4).withOpacity(0.2),
-                        width: 1,
-                      ),
-                    ),
-                    child: Text(
-                      _isJapanese 
-                          ? '一歩一歩の前進、すべてのブレークスルー、実現したすべての夢 - 私たちはあなたと共に祝いたいのです。あなたの成功物語が次の夢見る人を勇気づけます。'
-                          : 'Every step forward, every breakthrough, every dream realized - we want to celebrate with you. Your success story inspires the next dreamer.',
-                      style: const TextStyle(
-                        color: Colors.white60,
-                        fontSize: 14,
-                        height: 1.4,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 24),
-                  
+
+                  const SizedBox(height: 32),
+
                   // Action Buttons
                   Row(
                     children: [
@@ -338,7 +358,7 @@ class _TipScreenState extends State<TipScreen> {
                                     strokeWidth: 2,
                                   ),
                                 )
-                              : _getCelebrationButtonText(),
+                              : _getSupportButtonText(),
                         ),
                       ),
                     ],
@@ -353,7 +373,7 @@ class _TipScreenState extends State<TipScreen> {
     );
   }
 
-  Widget _getCelebrationButtonText() {
+  Widget _getSupportButtonText() {
     final cooldownSeconds = _purchaseService.remainingCooldownSeconds;
     if (cooldownSeconds > 0) {
       return Text(
@@ -365,7 +385,7 @@ class _TipScreenState extends State<TipScreen> {
       );
     }
     return Text(
-      _isJapanese ? '¥$selectedAmountで祝う' : 'Celebrate ¥$selectedAmount',
+      _isJapanese ? '支援する（¥100）' : 'Support with ¥100',
       style: const TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w600,
@@ -375,12 +395,12 @@ class _TipScreenState extends State<TipScreen> {
 
   Future<void> _processTip() async {
     if (_isLoading) return;
-    
+
     debugPrint('TipScreen: _processTip started');
     setState(() {
       _isLoading = true;
     });
-    
+
     // Show loading dialog
     if (mounted) {
       FeedbackDialog.showLoading(context, message: ErrorMessages.processingPurchase);
@@ -389,7 +409,7 @@ class _TipScreenState extends State<TipScreen> {
     try {
       // Initialize purchase service if not already done
       final bool isInitialized = await _purchaseService.initialize();
-      
+
       if (!isInitialized) {
         if (mounted) FeedbackDialog.hideLoading(context);
         _resetLoadingAndShowError(ErrorMessages.purchaseUnavailable);
@@ -403,16 +423,16 @@ class _TipScreenState extends State<TipScreen> {
         return;
       }
 
-      // Process purchase
+      // Process purchase (always 100 yen)
       debugPrint('TipScreen: Starting purchase (mode: ${_purchaseService.serviceMode})');
-      final TipPurchaseResponse response = await _purchaseService.purchaseTip(selectedAmount);
+      final TipPurchaseResponse response = await _purchaseService.purchaseTip(100);
       debugPrint('TipScreen: Purchase response: ${response.result}');
-      
+
       // Hide loading dialog
       if (mounted) {
         FeedbackDialog.hideLoading(context);
       }
-      
+
       // Reset loading state
       debugPrint('TipScreen: Resetting loading state (mounted: $mounted)');
       if (mounted) {
@@ -421,7 +441,7 @@ class _TipScreenState extends State<TipScreen> {
         });
         debugPrint('TipScreen: Loading state reset to false');
       }
-      
+
       // Handle response
       switch (response.result) {
         case TipPurchaseResult.success:
@@ -437,11 +457,11 @@ class _TipScreenState extends State<TipScreen> {
             debugPrint('TipScreen: Thank you dialog shown');
           }
           break;
-          
+
         case TipPurchaseResult.canceled:
           debugPrint('TipScreen: Purchase canceled');
           break;
-          
+
         case TipPurchaseResult.error:
           final errorMessage = response.error ?? ErrorMessages.purchaseFailed;
           final userFriendlyError = ErrorMessages.getUserFriendlyError(errorMessage);
@@ -457,21 +477,21 @@ class _TipScreenState extends State<TipScreen> {
             }
           }
           break;
-          
+
         case TipPurchaseResult.pending:
           if (!_purchaseService.isMockMode) {
             _showPendingDialog();
           }
           break;
       }
-      
+
     } catch (e) {
       debugPrint('TipScreen: Exception in _processTip: $e');
       if (mounted) FeedbackDialog.hideLoading(context);
       _resetLoadingAndShowError(ErrorMessages.getUserFriendlyError(e));
     }
   }
-  
+
   void _resetLoadingAndShowError(String message) async {
     if (mounted) {
       setState(() {
@@ -485,7 +505,7 @@ class _TipScreenState extends State<TipScreen> {
       );
     }
   }
-  
+
   void _navigateBack() {
     if (context.canPop()) {
       context.pop();
@@ -536,69 +556,5 @@ class _TipScreenState extends State<TipScreen> {
   void dispose() {
     _purchaseService.dispose();
     super.dispose();
-  }
-}
-
-class _TipAmountCard extends StatelessWidget {
-  final int amount;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const _TipAmountCard({
-    required this.amount,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: 80,
-        decoration: BoxDecoration(
-          gradient: isSelected
-              ? const LinearGradient(
-                  colors: [Color(0xFF4ECDC4), Color(0xFF6BCF7F)],
-                )
-              : LinearGradient(
-                  colors: [
-                    const Color(0xFF1A1A1A),
-                    const Color(0xFF0F0F0F),
-                  ],
-                ),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: isSelected
-                ? Colors.transparent
-                : const Color(0xFF4ECDC4).withOpacity(0.3),
-            width: 1,
-          ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: const Color(0xFF4ECDC4).withOpacity(0.3),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : null,
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              '¥$amount',
-              style: GoogleFonts.crimsonText(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: isSelected ? Colors.white : Colors.white70,
-              ),
-            ),
-            const SizedBox(height: 4),
-          ],
-        ),
-      ),
-    );
   }
 }
