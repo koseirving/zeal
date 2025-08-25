@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect, useCallback, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { doc, getDoc, addDoc, updateDoc, collection } from 'firebase/firestore';
 import { db } from '../../../../../lib/firebase';
@@ -23,13 +23,7 @@ export default function AffirmationEditPage({ params }: { params: Promise<{ id: 
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    if (!isNew) {
-      loadAffirmation();
-    }
-  }, [isNew, resolvedParams.id]);
-
-  const loadAffirmation = async () => {
+  const loadAffirmation = useCallback(async () => {
     try {
       const docRef = doc(db, 'affirmations', resolvedParams.id);
       const docSnap = await getDoc(docRef);
@@ -46,7 +40,13 @@ export default function AffirmationEditPage({ params }: { params: Promise<{ id: 
     } finally {
       setLoading(false);
     }
-  };
+  }, [resolvedParams.id, router]);
+
+  useEffect(() => {
+    if (!isNew) {
+      loadAffirmation();
+    }
+  }, [isNew, loadAffirmation]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,7 +74,7 @@ export default function AffirmationEditPage({ params }: { params: Promise<{ id: 
     }
   };
 
-  const handleChange = (field: keyof Affirmation, value: any) => {
+  const handleChange = (field: keyof Affirmation, value: string | boolean | number | string[]) => {
     setAffirmation(prev => ({ ...prev, [field]: value }));
   };
 
