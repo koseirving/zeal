@@ -1,3 +1,5 @@
+import '../config/app_config.dart';
+
 class TipProduct {
   final String id;
   final String title;
@@ -30,9 +32,8 @@ class TipProduct {
   static List<TipProductInfo> get availableTips => _getEnvironmentTips();
   
   static List<TipProductInfo> _getEnvironmentTips() {
-    // Use different product IDs for development and production
-    final isDev = const bool.fromEnvironment('dart.vm.product') == false;
-    final prefix = isDev ? 'dev_tip_' : 'tip_';
+    // Use different product IDs for development and production based on AppConfig
+    final prefix = AppConfig.isDev ? 'dev_tip_' : 'tip_';
     
     return [
       TipProductInfo(
@@ -67,8 +68,8 @@ class TipProduct {
   }
 
   static String getTipIdByAmount(int amount) {
-    final isDev = const bool.fromEnvironment('dart.vm.product') == false;
-    final prefix = isDev ? 'dev_tip_' : 'tip_';
+    // Use AppConfig to correctly determine environment
+    final prefix = AppConfig.isDev ? 'dev_tip_' : 'tip_';
     return '$prefix$amount';
   }
 }

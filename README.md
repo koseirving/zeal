@@ -43,11 +43,30 @@ flutter run -t lib/main_prod.dart
 ## ビルド
 
 ### iOS
+
+#### App Store提出用ビルド
+```bash
+# 1. クリーンビルド
+make clean
+make get
+
+# 2. Production環境でビルド（重要：必ずこのコマンドを使用）
+make build-prod-ios
+# または
+flutter build ios -t lib/main_prod.dart --dart-define=ENVIRONMENT=prod
+
+# 3. Xcodeでアーカイブ作成
+# - ios/Runner.xcworkspaceを開く
+# - Product > Archive
+# - App Store Connectへアップロード
+```
+
+#### 開発用ビルド
 ```bash
 # 開発環境
 make build-dev-ios
 
-# 本番環境
+# 本番環境（テスト用）
 make build-prod-ios
 ```
 
@@ -59,6 +78,12 @@ make build-dev-android
 # 本番環境
 make build-prod-android
 ```
+
+### 重要な注意事項
+⚠️ **App Store提出時は必ず`make build-prod-ios`を使用してください**
+- デフォルトの`flutter build ios`は開発環境でビルドされます
+- Production環境では実際のIn-App Purchaseが有効になります
+- 開発環境ではMockモードで動作し、実際の課金処理が行われません
 
 ## プロジェクト構造
 

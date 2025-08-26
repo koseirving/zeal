@@ -99,9 +99,22 @@ class TipPurchaseService {
 
   Future<bool> _tryInitializeRealPurchase() async {
     try {
-      return await _inAppPurchase.isAvailable();
+      debugPrint('TipPurchaseService: Checking In-App Purchase availability...');
+      final bool available = await _inAppPurchase.isAvailable();
+      debugPrint('TipPurchaseService: In-App Purchase available: $available');
+      
+      if (!available) {
+        debugPrint('TipPurchaseService: StoreKit/Play Store connection failed');
+        debugPrint('TipPurchaseService: Possible reasons:');
+        debugPrint('  - Device is not connected to internet');
+        debugPrint('  - App Store/Play Store is not available');
+        debugPrint('  - In-App Purchase capability not enabled');
+      }
+      
+      return available;
     } catch (e) {
-      debugPrint('TipPurchaseService: Real purchase initialization failed: $e');
+      debugPrint('TipPurchaseService: Real purchase initialization failed with exception: $e');
+      debugPrint('TipPurchaseService: Exception type: ${e.runtimeType}');
       return false;
     }
   }
@@ -112,24 +125,39 @@ class TipPurchaseService {
       final Set<String> productIds = TipProduct.availableTips
           .map((tip) => tip.id)
           .toSet();
+      
+      debugPrint('TipPurchaseService: Querying products from store...');
+      debugPrint('TipPurchaseService: Product IDs to query: ${productIds.join(", ")}');
+      debugPrint('TipPurchaseService: Environment: ${AppConfig.isDev ? "Development" : "Production"}');
 
       final ProductDetailsResponse response = 
           await _inAppPurchase.queryProductDetails(productIds);
 
       if (response.error != null) {
-        debugPrint('Error loading products: ${response.error}');
+        debugPrint('TipPurchaseService: Error loading products: ${response.error}');
+        debugPrint('TipPurchaseService: Error details: ${response.error!.message}');
+        debugPrint('TipPurchaseService: This may indicate:');
+        debugPrint('  - Products not configured in App Store Connect/Play Console');
+        debugPrint('  - Banking/tax information not complete');
+        debugPrint('  - Products not approved yet');
         return;
       }
 
       _products = response.productDetails;
-      debugPrint('Loaded ${_products.length} tip products');
+      debugPrint('TipPurchaseService: Successfully loaded ${_products.length} tip products');
       
-      for (final product in _products) {
-        debugPrint('Product: ${product.id} - ${product.price}');
+      if (_products.isEmpty) {
+        debugPrint('TipPurchaseService: WARNING - No products found!');
+        debugPrint('TipPurchaseService: Requested IDs: ${productIds.join(", ")}');
+      } else {
+        for (final product in _products) {
+          debugPrint('TipPurchaseService: Found product: ${product.id} - ${product.price}');
+        }
       }
       
     } catch (e) {
-      debugPrint('Failed to load products: $e');
+      debugPrint('TipPurchaseService: Exception while loading products: $e');
+      debugPrint('TipPurchaseService: Stack trace: ${StackTrace.current}');
     }
   }
 
@@ -194,31 +222,44 @@ class TipPurchaseService {
 
       // Real purchase flow
       try {
+        debugPrint('TipPurchaseService: Starting real purchase for product: ${product.id}');
+        
         // Create purchase param
         final PurchaseParam purchaseParam = PurchaseParam(
           productDetails: product as ProductDetails,
         );
 
         // Start the purchase
+        debugPrint('TipPurchaseService: Calling buyConsumable...');
         final bool success = await _inAppPurchase.buyConsumable(
           purchaseParam: purchaseParam,
         );
 
         if (!success) {
-          return TipPurchaseResponse.error('Failed to initiate purchase');
+          debugPrint('TipPurchaseService: buyConsumable returned false');
+          _isPurchaseInProgress = false; // Reset state on failure
+          return TipPurchaseResponse.error('Failed to initiate purchase - Store returned false');
         }
-
+        
+        debugPrint('TipPurchaseService: Purchase initiated successfully, waiting for response...');
         // Return pending status - actual result will come via purchase stream
         return TipPurchaseResponse.pending();
       } catch (e) {
-        debugPrint('TipPurchaseService: Real purchase failed: $e');
+        debugPrint('TipPurchaseService: Real purchase failed with exception: $e');
+        debugPrint('TipPurchaseService: Exception type: ${e.runtimeType}');
+        _isPurchaseInProgress = false; // Reset state on exception
         return TipPurchaseResponse.error('Purchase failed: ${e.toString()}');
       }
       
     } catch (e) {
-      debugPrint('TipPurchaseService: Purchase error: $e');
-      _isPurchaseInProgress = false; // Reset on error
+      debugPrint('TipPurchaseService: Outer purchase error: $e');
+      _isPurchaseInProgress = false; // Always reset on error
       return TipPurchaseResponse.error('Purchase failed: ${e.toString()}');
+    } finally {
+      // Ensure state is always consistent
+      if (_isPurchaseInProgress) {
+        debugPrint('TipPurchaseService: Purchase state still in progress after error, resetting...');
+      }
     }
   }
 
