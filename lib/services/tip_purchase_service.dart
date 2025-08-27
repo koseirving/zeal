@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -33,24 +32,23 @@ class TipPurchaseService {
   List<MockProductDetails> get _mockProducts {
     return [
       MockProductDetails(id: TipProduct.getTipIdByAmount(100), price: '¥100', rawPrice: 100.0),
-      MockProductDetails(id: TipProduct.getTipIdByAmount(300), price: '¥300', rawPrice: 300.0),
-      MockProductDetails(id: TipProduct.getTipIdByAmount(500), price: '¥500', rawPrice: 500.0),
-      MockProductDetails(id: TipProduct.getTipIdByAmount(1000), price: '¥1000', rawPrice: 1000.0),
     ];
   }
 
   // Initialize the purchase service
   Future<bool> initialize() async {
     try {
-      // Always use mock mode in development for now (until StoreKit is properly configured)
-      if (AppConfig.isDev || kDebugMode) {
+      // Use mock mode only in development environment
+      // Do NOT use kDebugMode as it affects TestFlight builds
+      if (AppConfig.isDev) {
         debugPrint('TipPurchaseService: Development environment - using mock mode');
         _useMockMode = true;
         _isAvailable = true;
         return true;
       }
       
-      // In production, try real purchase
+      // In production and TestFlight, always use real purchase
+      debugPrint('TipPurchaseService: Production/TestFlight environment - attempting real In-App Purchase');
       _isAvailable = await _tryInitializeRealPurchase();
       
       if (_isAvailable) {
@@ -84,13 +82,16 @@ class TipPurchaseService {
       return true;
     } catch (e) {
       debugPrint('TipPurchaseService: Failed to initialize: $e');
+      debugPrint('TipPurchaseService: Stack trace: ${StackTrace.current}');
       
-      // Fallback to mock mode in development
-      if (AppConfig.isDev && kDebugMode) {
-        debugPrint('TipPurchaseService: Using mock mode as fallback');
-        _useMockMode = true;
-        _isAvailable = true;
-        return true;
+      // In production, initialization failure is critical
+      if (!AppConfig.isDev) {
+        debugPrint('TipPurchaseService: CRITICAL ERROR - In-App Purchase not available in production');
+        debugPrint('TipPurchaseService: Please ensure:');
+        debugPrint('  1. In-App Purchase capability is enabled in Xcode');
+        debugPrint('  2. Products are configured in App Store Connect');
+        debugPrint('  3. Agreements, Tax, and Banking are complete');
+        debugPrint('  4. Device is connected to the internet');
       }
       
       return false;
@@ -108,7 +109,9 @@ class TipPurchaseService {
         debugPrint('TipPurchaseService: Possible reasons:');
         debugPrint('  - Device is not connected to internet');
         debugPrint('  - App Store/Play Store is not available');
-        debugPrint('  - In-App Purchase capability not enabled');
+        debugPrint('  - In-App Purchase capability not enabled in Xcode');
+        debugPrint('  - Runner.entitlements missing In-App Purchase entitlement');
+        debugPrint('TipPurchaseService: Current environment: ${AppConfig.environmentName}');
       }
       
       return available;
@@ -149,6 +152,10 @@ class TipPurchaseService {
       if (_products.isEmpty) {
         debugPrint('TipPurchaseService: WARNING - No products found!');
         debugPrint('TipPurchaseService: Requested IDs: ${productIds.join(", ")}');
+        debugPrint('TipPurchaseService: This likely means:');
+        debugPrint('  - Products not yet created in App Store Connect');
+        debugPrint('  - Product IDs mismatch between code and App Store Connect');
+        debugPrint('  - Products still pending review');
       } else {
         for (final product in _products) {
           debugPrint('TipPurchaseService: Found product: ${product.id} - ${product.price}');
@@ -237,8 +244,12 @@ class TipPurchaseService {
 
         if (!success) {
           debugPrint('TipPurchaseService: buyConsumable returned false');
+          debugPrint('TipPurchaseService: This usually means:');
+          debugPrint('  - User not signed in to App Store');
+          debugPrint('  - Parental controls preventing purchases');
+          debugPrint('  - In-App Purchase disabled in Settings');
           _isPurchaseInProgress = false; // Reset state on failure
-          return TipPurchaseResponse.error('Failed to initiate purchase - Store returned false');
+          return TipPurchaseResponse.error('購入を開始できませんでした。App Storeにサインインしているか、設定でアプリ内課金が有効になっているか確認してください。');
         }
         
         debugPrint('TipPurchaseService: Purchase initiated successfully, waiting for response...');

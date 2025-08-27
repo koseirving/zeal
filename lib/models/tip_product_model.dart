@@ -39,22 +39,7 @@ class TipProduct {
       TipProductInfo(
         id: '${prefix}100',
         amount: 100,
-        description: 'Small celebration tip',
-      ),
-      TipProductInfo(
-        id: '${prefix}300',
-        amount: 300,
-        description: 'Medium celebration tip',
-      ),
-      TipProductInfo(
-        id: '${prefix}500',
-        amount: 500,
-        description: 'Large celebration tip',
-      ),
-      TipProductInfo(
-        id: '${prefix}1000',
-        amount: 1000,
-        description: 'Premium celebration tip',
+        description: 'Support tip',
       ),
     ];
   }

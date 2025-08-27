@@ -11,6 +11,9 @@ class ErrorMessages {
   static const String purchaseFailed = '購入処理に失敗しました。もう一度お試しください。';
   static const String productNotFound = '商品が見つかりません。';
   static const String purchaseCooldown = '連続購入はできません。しばらくお待ちください。';
+  static const String appStoreNotSignedIn = 'App Storeにサインインしてください。';
+  static const String inAppPurchaseDisabled = 'アプリ内課金が無効になっています。設定を確認してください。';
+  static const String parentalControlRestriction = '保護者による制限がかかっています。';
   
   // Authentication errors
   static const String authenticationError = '認証エラーが発生しました。';

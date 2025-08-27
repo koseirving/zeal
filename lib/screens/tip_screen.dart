@@ -412,14 +412,20 @@ class _TipScreenState extends State<TipScreen> {
 
       if (!isInitialized) {
         if (mounted) FeedbackDialog.hideLoading(context);
-        _resetLoadingAndShowError(ErrorMessages.purchaseUnavailable);
+        final errorMsg = _isJapanese 
+          ? '購入機能が利用できません。\nApp Storeにサインインしているか、\nインターネット接続を確認してください。'
+          : 'Purchase feature unavailable.\nPlease check if you are signed in to App Store\nand have internet connection.';
+        _resetLoadingAndShowError(errorMsg);
         return;
       }
 
       // Check if the service is available
       if (!_purchaseService.isAvailable) {
         if (mounted) FeedbackDialog.hideLoading(context);
-        _resetLoadingAndShowError(ErrorMessages.purchaseUnavailable);
+        final errorMsg = _isJapanese
+          ? 'アプリ内購入が無効です。\n設定 > スクリーンタイム > コンテンツとプライバシーの制限\nでアプリ内課金が許可されているか確認してください。'
+          : 'In-app purchase is disabled.\nPlease check Settings > Screen Time > Content & Privacy Restrictions\nto ensure in-app purchases are allowed.';
+        _resetLoadingAndShowError(errorMsg);
         return;
       }
 
@@ -464,13 +470,31 @@ class _TipScreenState extends State<TipScreen> {
 
         case TipPurchaseResult.error:
           final errorMessage = response.error ?? ErrorMessages.purchaseFailed;
-          final userFriendlyError = ErrorMessages.getUserFriendlyError(errorMessage);
+          String userFriendlyError;
+          
+          // Provide more specific error messages
+          if (errorMessage.contains('not signed in') || errorMessage.contains('App Store')) {
+            userFriendlyError = _isJapanese
+              ? 'App Storeにサインインしてください'
+              : 'Please sign in to App Store';
+          } else if (errorMessage.contains('Product not found')) {
+            userFriendlyError = _isJapanese
+              ? '商品が見つかりません。アプリを再起動してください。'
+              : 'Product not found. Please restart the app.';
+          } else if (errorMessage.contains('already in progress')) {
+            userFriendlyError = _isJapanese
+              ? '購入処理中です。しばらくお待ちください。'
+              : 'Purchase in progress. Please wait.';
+          } else {
+            userFriendlyError = ErrorMessages.getUserFriendlyError(errorMessage);
+          }
+          
           if (mounted) {
             final shouldRetry = await FeedbackDialog.showError(
               context,
-              title: 'エラー',
+              title: _isJapanese ? 'エラー' : 'Error',
               message: userFriendlyError,
-              showRetry: true,
+              showRetry: !errorMessage.contains('already in progress'),
             );
             if (shouldRetry) {
               _processTip(); // Retry
