@@ -139,6 +139,7 @@ class ZealApp extends StatelessWidget {
         ),
       ),
       routerConfig: _router,
+      debugShowCheckedModeBanner: false,
     );
   }
 }
