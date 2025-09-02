@@ -7,6 +7,7 @@ import '../widgets/feedback_dialog.dart';
 import '../utils/error_messages.dart';
 import '../services/usage_stats_service.dart';
 import '../services/auth_service.dart';
+import '../config/app_config.dart';
 
 class TipScreen extends StatefulWidget {
   const TipScreen({super.key});
@@ -27,6 +28,16 @@ class _TipScreenState extends State<TipScreen> {
   void initState() {
     super.initState();
     _loadUserStats();
+    _logEnvironmentInfo();
+  }
+  
+  void _logEnvironmentInfo() {
+    debugPrint('===== TipScreen Environment Info =====');
+    debugPrint('Environment: ${AppConfig.environmentName}');
+    debugPrint('isDev: ${AppConfig.isDev}');
+    debugPrint('isProd: ${AppConfig.isProd}');
+    debugPrint('Expected product ID: ${TipProduct.getTipIdByAmount(100)}');
+    debugPrint('======================================');
   }
 
   Future<void> _loadUserStats() async {
@@ -440,14 +451,16 @@ class _TipScreenState extends State<TipScreen> {
 
     try {
       // Initialize purchase service if not already done
+      debugPrint('===== TipScreen: Starting Purchase Process =====');
+      debugPrint('TipScreen: Initializing purchase service...');
       final bool isInitialized = await _purchaseService.initialize();
 
       if (!isInitialized) {
         if (mounted) FeedbackDialog.hideLoading(context);
         final errorMsg =
             _isJapanese
-                ? '購入機能が利用できません。\nApp Storeにサインインしているか、\nインターネット接続を確認してください。'
-                : 'Purchase feature unavailable.\nPlease check if you are signed in to App Store\nand have internet connection.';
+                ? '購入機能が利用できません。\nApp Storeにサインインしているか、\nインターネット接続を確認してください。\n\n開発者向け：本番ビルドは「make build-prod-ios」を使用してください。'
+                : 'Purchase feature unavailable.\nPlease check if you are signed in to App Store\nand have internet connection.\n\nFor developers: Use "make build-prod-ios" for production builds.';
         _resetLoadingAndShowError(errorMsg);
         return;
       }
@@ -464,13 +477,18 @@ class _TipScreenState extends State<TipScreen> {
       }
 
       // Process purchase (always 100 yen)
-      debugPrint(
-        'TipScreen: Starting purchase (mode: ${_purchaseService.serviceMode})',
-      );
+      debugPrint('TipScreen: Service mode: ${_purchaseService.serviceMode}');
+      debugPrint('TipScreen: Is available: ${_purchaseService.isAvailable}');
+      debugPrint('TipScreen: Products count: ${_purchaseService.products.length}');
+      debugPrint('TipScreen: Starting purchase for ¥100...');
+      
       final TipPurchaseResponse response = await _purchaseService.purchaseTip(
         100,
       );
       debugPrint('TipScreen: Purchase response: ${response.result}');
+      if (response.error != null) {
+        debugPrint('TipScreen: Purchase error: ${response.error}');
+      }
 
       // Hide loading dialog
       if (mounted) {
@@ -520,8 +538,8 @@ class _TipScreenState extends State<TipScreen> {
           } else if (errorMessage.contains('Product not found')) {
             userFriendlyError =
                 _isJapanese
-                    ? '商品が見つかりません。アプリを再起動してください。'
-                    : 'Product not found. Please restart the app.';
+                    ? '商品が見つかりません。\nApp Store Connectで「tip_100」が設定されているか確認してください。\n\n開発者向け：本番ビルドは「make build-prod-ios」を使用してください。'
+                    : 'Product not found.\nPlease ensure "tip_100" is configured in App Store Connect.\n\nFor developers: Use "make build-prod-ios" for production builds.';
           } else if (errorMessage.contains('already in progress')) {
             userFriendlyError =
                 _isJapanese

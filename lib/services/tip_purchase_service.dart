@@ -38,6 +38,12 @@ class TipPurchaseService {
   // Initialize the purchase service
   Future<bool> initialize() async {
     try {
+      // Log current environment for debugging
+      debugPrint('===== TipPurchaseService Initialization =====');
+      debugPrint('Environment: ${AppConfig.environmentName}');
+      debugPrint('isDev: ${AppConfig.isDev}');
+      debugPrint('isProd: ${AppConfig.isProd}');
+      
       // Use mock mode only in development environment
       // Do NOT use kDebugMode as it affects TestFlight builds
       if (AppConfig.isDev) {
@@ -49,6 +55,7 @@ class TipPurchaseService {
       
       // In production and TestFlight, always use real purchase
       debugPrint('TipPurchaseService: Production/TestFlight environment - attempting real In-App Purchase');
+      debugPrint('Expected Product ID for production: tip_100');
       _isAvailable = await _tryInitializeRealPurchase();
       
       if (_isAvailable) {
@@ -129,9 +136,11 @@ class TipPurchaseService {
           .map((tip) => tip.id)
           .toSet();
       
+      debugPrint('===== Loading Products from App Store =====');
       debugPrint('TipPurchaseService: Querying products from store...');
       debugPrint('TipPurchaseService: Product IDs to query: ${productIds.join(", ")}');
-      debugPrint('TipPurchaseService: Environment: ${AppConfig.isDev ? "Development" : "Production"}');
+      debugPrint('TipPurchaseService: Environment: ${AppConfig.environmentName}');
+      debugPrint('TipPurchaseService: Using prefix: ${AppConfig.isDev ? "dev_tip_" : "tip_"}');
 
       final ProductDetailsResponse response = 
           await _inAppPurchase.queryProductDetails(productIds);
@@ -148,18 +157,27 @@ class TipPurchaseService {
 
       _products = response.productDetails;
       debugPrint('TipPurchaseService: Successfully loaded ${_products.length} tip products');
+      debugPrint('===== Loaded Products Details =====');
       
       if (_products.isEmpty) {
-        debugPrint('TipPurchaseService: WARNING - No products found!');
+        debugPrint('===== CRITICAL: No Products Found! =====');
         debugPrint('TipPurchaseService: Requested IDs: ${productIds.join(", ")}');
+        debugPrint('TipPurchaseService: Environment: ${AppConfig.environmentName}');
         debugPrint('TipPurchaseService: This likely means:');
-        debugPrint('  - Products not yet created in App Store Connect');
-        debugPrint('  - Product IDs mismatch between code and App Store Connect');
-        debugPrint('  - Products still pending review');
+        debugPrint('  1. Products not created in App Store Connect');
+        debugPrint('  2. Product IDs mismatch (expected: tip_100 for production)');
+        debugPrint('  3. Products not approved in App Store Connect');
+        debugPrint('  4. Banking/Tax info incomplete in App Store Connect');
+        debugPrint('  5. Product not available in current region');
+        debugPrint('========================================');
       } else {
         for (final product in _products) {
-          debugPrint('TipPurchaseService: Found product: ${product.id} - ${product.price}');
+          debugPrint('TipPurchaseService: ✓ Found product: ${product.id}');
+          debugPrint('  - Price: ${product.price}');
+          debugPrint('  - Title: ${product.title}');
+          debugPrint('  - Description: ${product.description}');
         }
+        debugPrint('========================================');
       }
       
     } catch (e) {
@@ -171,20 +189,32 @@ class TipPurchaseService {
   // Get product details by amount
   dynamic getProductByAmount(int amount) {
     final productId = TipProduct.getTipIdByAmount(amount);
+    debugPrint('TipPurchaseService: Looking for product with ID: $productId');
+    debugPrint('TipPurchaseService: Current mode: ${_useMockMode ? "Mock" : "Real"}');
     
     if (_useMockMode) {
       try {
-        return _mockProducts.firstWhere((product) => product.id == productId);
+        final product = _mockProducts.firstWhere((product) => product.id == productId);
+        debugPrint('TipPurchaseService: ✓ Found mock product: $productId');
+        return product;
       } catch (e) {
-        debugPrint('TipPurchaseService: Mock product not found for amount: $amount');
+        debugPrint('TipPurchaseService: ✗ Mock product not found for ID: $productId');
         return null;
       }
     }
     
     try {
-      return _products.firstWhere((product) => product.id == productId);
+      debugPrint('TipPurchaseService: Available products: ${_products.map((p) => p.id).join(", ")}');
+      final product = _products.firstWhere((product) => product.id == productId);
+      debugPrint('TipPurchaseService: ✓ Found product: ${product.id} - ${product.price}');
+      return product;
     } catch (e) {
+      debugPrint('===== PRODUCT NOT FOUND ERROR =====');
       debugPrint('TipPurchaseService: Product not found for amount: $amount');
+      debugPrint('TipPurchaseService: Expected product ID: $productId');
+      debugPrint('TipPurchaseService: Available product IDs: ${_products.map((p) => p.id).join(", ")}');
+      debugPrint('TipPurchaseService: Total products loaded: ${_products.length}');
+      debugPrint('====================================');
       return null;
     }
   }
@@ -219,7 +249,17 @@ class TipPurchaseService {
       final product = getProductByAmount(amount);
       if (product == null) {
         _isPurchaseInProgress = false; // Reset on error
-        return TipPurchaseResponse.error('Product not found for amount: ¥$amount');
+        debugPrint('===== PURCHASE FAILED: Product Not Found =====');
+        debugPrint('Environment: ${AppConfig.environmentName}');
+        debugPrint('Requested amount: ¥$amount');
+        debugPrint('Expected product ID: ${TipProduct.getTipIdByAmount(amount)}');
+        debugPrint('===============================================');
+        
+        // More detailed error message
+        final errorMessage = AppConfig.isProd 
+            ? 'Product not found. Please ensure:\n1. App was built with "make build-prod-ios"\n2. Product "tip_100" exists in App Store Connect\n3. Product is approved and available'
+            : 'Product not found for amount: ¥$amount';
+        return TipPurchaseResponse.error(errorMessage);
       }
 
       // Handle mock mode
