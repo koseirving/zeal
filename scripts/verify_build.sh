@@ -80,10 +80,14 @@ fi
 if [ -f "ios/Runner/Runner.entitlements" ]; then
     print_success "Runner.entitlements exists"
     
-    if grep -q "tip_100" ios/Runner/Runner.entitlements; then
-        print_success "Product 'tip_100' found in entitlements"
+    # Check if it has incorrect In-App Purchase settings
+    if grep -q "com.apple.developer.in-app-payments" ios/Runner/Runner.entitlements; then
+        print_error "Found 'com.apple.developer.in-app-payments' in entitlements"
+        print_error "This is for Apple Pay, not In-App Purchase!"
+        print_error "In-App Purchase doesn't need special entitlements"
     else
-        print_warning "Product 'tip_100' not found in entitlements (may not be required)"
+        print_success "No incorrect entitlements found"
+        print_success "In-App Purchase works automatically without special entitlements"
     fi
 else
     print_error "Runner.entitlements not found"

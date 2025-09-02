@@ -2,9 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>com.apple.developer.in-app-payments</key>
-	<array>
-		<string>tip_100</string>
-	</array>
+	<!-- In-App Purchase は自動的に利用可能なため、特別な entitlement は不要 -->
 </dict>
 </plist>
