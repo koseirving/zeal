@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'config/dev/firebase_options.dart';
 import 'config/app_config.dart';
-import 'main.dart';
+import 'app.dart';
 import 'services/notification_service.dart';
 
 void main() async {
