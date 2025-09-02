@@ -21,10 +21,7 @@ class _TipScreenState extends State<TipScreen> {
   final AuthService _authService = AuthService();
   bool _isLoading = false;
   bool _isJapanese = false;
-  Map<String, int> _userStats = {
-    'totalFocusMinutes': 0,
-    'totalDays': 0,
-  };
+  Map<String, int> _userStats = {'totalFocusMinutes': 0, 'totalDays': 0};
 
   @override
   void initState() {
@@ -101,9 +98,10 @@ class _TipScreenState extends State<TipScreen> {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: !_isJapanese
-                          ? const Color(0xFFFF6B35)
-                          : Colors.transparent,
+                      color:
+                          !_isJapanese
+                              ? const Color(0xFFFF6B35)
+                              : Colors.transparent,
                       borderRadius: BorderRadius.circular(18),
                     ),
                     child: Text(
@@ -111,9 +109,10 @@ class _TipScreenState extends State<TipScreen> {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: !_isJapanese
-                            ? Colors.white
-                            : Colors.white.withValues(alpha: 0.6),
+                        color:
+                            !_isJapanese
+                                ? Colors.white
+                                : Colors.white.withValues(alpha: 0.6),
                       ),
                     ),
                   ),
@@ -130,9 +129,10 @@ class _TipScreenState extends State<TipScreen> {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: _isJapanese
-                          ? const Color(0xFFFF6B35)
-                          : Colors.transparent,
+                      color:
+                          _isJapanese
+                              ? const Color(0xFFFF6B35)
+                              : Colors.transparent,
                       borderRadius: BorderRadius.circular(18),
                     ),
                     child: Text(
@@ -140,9 +140,10 @@ class _TipScreenState extends State<TipScreen> {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: _isJapanese
-                            ? Colors.white
-                            : Colors.white.withValues(alpha: 0.6),
+                        color:
+                            _isJapanese
+                                ? Colors.white
+                                : Colors.white.withValues(alpha: 0.6),
                       ),
                     ),
                   ),
@@ -157,11 +158,7 @@ class _TipScreenState extends State<TipScreen> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF0A0A0A),
-              Color(0xFF1A1A1A),
-              Color(0xFF0F0F0F),
-            ],
+            colors: [Color(0xFF0A0A0A), Color(0xFF1A1A1A), Color(0xFF0F0F0F)],
             stops: [0.0, 0.5, 1.0],
           ),
         ),
@@ -179,13 +176,13 @@ class _TipScreenState extends State<TipScreen> {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          const Color(0xFFFF6B35).withOpacity(0.3),
-                          const Color(0xFFFFD93D).withOpacity(0.3),
+                          const Color(0xFFFF6B35).withValues(alpha: 0.3),
+                          const Color(0xFFFFD93D).withValues(alpha: 0.3),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(50),
                       border: Border.all(
-                        color: const Color(0xFFFF6B35).withOpacity(0.5),
+                        color: const Color(0xFFFF6B35).withValues(alpha: 0.5),
                         width: 2,
                       ),
                     ),
@@ -202,17 +199,19 @@ class _TipScreenState extends State<TipScreen> {
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1A1A1A).withOpacity(0.5),
+                      color: const Color(0xFF1A1A1A).withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: const Color(0xFFFF6B35).withOpacity(0.2),
+                        color: const Color(0xFFFF6B35).withValues(alpha: 0.2),
                         width: 1,
                       ),
                     ),
                     child: Column(
                       children: [
                         Text(
-                          _isJapanese ? 'ZEALと刻んだ、夢への軌跡' : 'Your Path, Forged with ZEAL',
+                          _isJapanese
+                              ? 'ZEALと刻んだ、夢への軌跡'
+                              : 'Your Path, Forged with ZEAL',
                           style: GoogleFonts.crimsonText(
                             fontSize: 18,
                             fontWeight: FontWeight.w500,
@@ -276,7 +275,9 @@ class _TipScreenState extends State<TipScreen> {
 
                   // Title
                   Text(
-                    _isJapanese ? '共に夢を追いかけ続けよう' : "Let's Pursue The Dream, Together.",
+                    _isJapanese
+                        ? '共に夢を追いかけ続けよう'
+                        : "Let's Pursue The Dream, Together.",
                     style: GoogleFonts.crimsonText(
                       fontSize: 24,
                       fontWeight: FontWeight.w600,
@@ -286,19 +287,47 @@ class _TipScreenState extends State<TipScreen> {
                     textAlign: TextAlign.center,
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
 
-                  // Subtitle
+                  // Main Message - Direct and Honest
                   Text(
                     _isJapanese
-                        ? 'ZEALがあなたの夢の実現を支援し、\nあなたの支援がZEALを維持する'
-                        : 'ZEAL supports your dream.\nYour support sustains ZEAL.',
-                    style: const TextStyle(
-                      color: Colors.white70,
+                        ? 'ZEALは広告を一切表示しません。\nあなたの夢の妨げは全て排除しています。'
+                        : 'ZEAL shows no ads. Ever.\nWe eliminate everything that distracts from your dreams.',
+                    style: GoogleFonts.crimsonText(
                       fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
                       height: 1.5,
                     ),
                     textAlign: TextAlign.center,
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // Reality Check
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1A1A1A).withValues(alpha: 0.5),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: const Color(0xFFFF6B35).withValues(alpha: 0.3),
+                        width: 1,
+                      ),
+                    ),
+                    child: Text(
+                      _isJapanese
+                          ? 'あなたの夢を一番近くで応援し続けるために、もしZEALがあなたの夢の実現に貢献できたその時には、支援のご検討をお願いします。'
+                          : 'To keep supporting your dreams, if you feel ZEAL has helped you take a step toward them, please consider supporting us.',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.9),
+                        fontSize: 16,
+                        height: 1.6,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      // textAlign: TextAlign.center,
+                    ),
                   ),
 
                   const SizedBox(height: 32),
@@ -320,7 +349,7 @@ class _TipScreenState extends State<TipScreen> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                               side: BorderSide(
-                                color: Colors.white.withOpacity(0.2),
+                                color: Colors.white.withValues(alpha: 0.2),
                                 width: 1,
                               ),
                             ),
@@ -339,7 +368,11 @@ class _TipScreenState extends State<TipScreen> {
                       Expanded(
                         flex: 2,
                         child: ElevatedButton(
-                          onPressed: (_isLoading || _purchaseService.isPurchaseInProgress) ? null : () => _processTip(),
+                          onPressed:
+                              (_isLoading ||
+                                      _purchaseService.isPurchaseInProgress)
+                                  ? null
+                                  : () => _processTip(),
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             backgroundColor: const Color(0xFFFF6B35),
@@ -349,16 +382,18 @@ class _TipScreenState extends State<TipScreen> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          child: _isLoading || _purchaseService.isPurchaseInProgress
-                              ? const SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : _getSupportButtonText(),
+                          child:
+                              _isLoading ||
+                                      _purchaseService.isPurchaseInProgress
+                                  ? const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                  : _getSupportButtonText(),
                         ),
                       ),
                     ],
@@ -378,18 +413,12 @@ class _TipScreenState extends State<TipScreen> {
     if (cooldownSeconds > 0) {
       return Text(
         _isJapanese ? '${cooldownSeconds}秒待ってください' : 'Wait ${cooldownSeconds}s',
-        style: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-        ),
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
       );
     }
     return Text(
-      _isJapanese ? '支援する（¥100）' : 'Support with ¥100',
-      style: const TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.w600,
-      ),
+      _isJapanese ? '支援する (100円)' : 'Support (¥100)',
+      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
     );
   }
 
@@ -403,7 +432,10 @@ class _TipScreenState extends State<TipScreen> {
 
     // Show loading dialog
     if (mounted) {
-      FeedbackDialog.showLoading(context, message: ErrorMessages.processingPurchase);
+      FeedbackDialog.showLoading(
+        context,
+        message: ErrorMessages.processingPurchase,
+      );
     }
 
     try {
@@ -412,9 +444,10 @@ class _TipScreenState extends State<TipScreen> {
 
       if (!isInitialized) {
         if (mounted) FeedbackDialog.hideLoading(context);
-        final errorMsg = _isJapanese 
-          ? '購入機能が利用できません。\nApp Storeにサインインしているか、\nインターネット接続を確認してください。'
-          : 'Purchase feature unavailable.\nPlease check if you are signed in to App Store\nand have internet connection.';
+        final errorMsg =
+            _isJapanese
+                ? '購入機能が利用できません。\nApp Storeにサインインしているか、\nインターネット接続を確認してください。'
+                : 'Purchase feature unavailable.\nPlease check if you are signed in to App Store\nand have internet connection.';
         _resetLoadingAndShowError(errorMsg);
         return;
       }
@@ -422,16 +455,21 @@ class _TipScreenState extends State<TipScreen> {
       // Check if the service is available
       if (!_purchaseService.isAvailable) {
         if (mounted) FeedbackDialog.hideLoading(context);
-        final errorMsg = _isJapanese
-          ? 'アプリ内購入が無効です。\n設定 > スクリーンタイム > コンテンツとプライバシーの制限\nでアプリ内課金が許可されているか確認してください。'
-          : 'In-app purchase is disabled.\nPlease check Settings > Screen Time > Content & Privacy Restrictions\nto ensure in-app purchases are allowed.';
+        final errorMsg =
+            _isJapanese
+                ? 'アプリ内購入が無効です。\n設定 > スクリーンタイム > コンテンツとプライバシーの制限\nでアプリ内課金が許可されているか確認してください。'
+                : 'In-app purchase is disabled.\nPlease check Settings > Screen Time > Content & Privacy Restrictions\nto ensure in-app purchases are allowed.';
         _resetLoadingAndShowError(errorMsg);
         return;
       }
 
       // Process purchase (always 100 yen)
-      debugPrint('TipScreen: Starting purchase (mode: ${_purchaseService.serviceMode})');
-      final TipPurchaseResponse response = await _purchaseService.purchaseTip(100);
+      debugPrint(
+        'TipScreen: Starting purchase (mode: ${_purchaseService.serviceMode})',
+      );
+      final TipPurchaseResponse response = await _purchaseService.purchaseTip(
+        100,
+      );
       debugPrint('TipScreen: Purchase response: ${response.result}');
 
       // Hide loading dialog
@@ -471,24 +509,30 @@ class _TipScreenState extends State<TipScreen> {
         case TipPurchaseResult.error:
           final errorMessage = response.error ?? ErrorMessages.purchaseFailed;
           String userFriendlyError;
-          
+
           // Provide more specific error messages
-          if (errorMessage.contains('not signed in') || errorMessage.contains('App Store')) {
-            userFriendlyError = _isJapanese
-              ? 'App Storeにサインインしてください'
-              : 'Please sign in to App Store';
+          if (errorMessage.contains('not signed in') ||
+              errorMessage.contains('App Store')) {
+            userFriendlyError =
+                _isJapanese
+                    ? 'App Storeにサインインしてください'
+                    : 'Please sign in to App Store';
           } else if (errorMessage.contains('Product not found')) {
-            userFriendlyError = _isJapanese
-              ? '商品が見つかりません。アプリを再起動してください。'
-              : 'Product not found. Please restart the app.';
+            userFriendlyError =
+                _isJapanese
+                    ? '商品が見つかりません。アプリを再起動してください。'
+                    : 'Product not found. Please restart the app.';
           } else if (errorMessage.contains('already in progress')) {
-            userFriendlyError = _isJapanese
-              ? '購入処理中です。しばらくお待ちください。'
-              : 'Purchase in progress. Please wait.';
+            userFriendlyError =
+                _isJapanese
+                    ? '購入処理中です。しばらくお待ちください。'
+                    : 'Purchase in progress. Please wait.';
           } else {
-            userFriendlyError = ErrorMessages.getUserFriendlyError(errorMessage);
+            userFriendlyError = ErrorMessages.getUserFriendlyError(
+              errorMessage,
+            );
           }
-          
+
           if (mounted) {
             final shouldRetry = await FeedbackDialog.showError(
               context,
@@ -508,7 +552,6 @@ class _TipScreenState extends State<TipScreen> {
           }
           break;
       }
-
     } catch (e) {
       debugPrint('TipScreen: Exception in _processTip: $e');
       if (mounted) FeedbackDialog.hideLoading(context);
@@ -538,41 +581,36 @@ class _TipScreenState extends State<TipScreen> {
     }
   }
 
-
   void _showPendingDialog() {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A1A),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const CircularProgressIndicator(
-              color: Color(0xFF4ECDC4),
+      builder:
+          (context) => AlertDialog(
+            backgroundColor: const Color(0xFF1A1A1A),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
             ),
-            const SizedBox(height: 16),
-            Text(
-              '購入処理中...',
-              style: GoogleFonts.crimsonText(
-                fontSize: 18,
-                color: Colors.white,
-              ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const CircularProgressIndicator(color: Color(0xFF4ECDC4)),
+                const SizedBox(height: 16),
+                Text(
+                  '購入処理中...',
+                  style: GoogleFonts.crimsonText(
+                    fontSize: 18,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'しばらくお待ちください',
+                  style: TextStyle(color: Colors.white70, fontSize: 14),
+                ),
+              ],
             ),
-            const SizedBox(height: 8),
-            const Text(
-              'しばらくお待ちください',
-              style: TextStyle(
-                color: Colors.white70,
-                fontSize: 14,
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
