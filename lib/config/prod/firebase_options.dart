@@ -59,7 +59,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyBjSbKNl_hec8UkW7eLgBSuq_y1NOm_rhU',
-    appId: '1:757471946876:ios:dc5fec3c387023da7601f9',
+    appId: '1:757471946876:ios:fdbd8d1ab9348e7f7601f9',
     messagingSenderId: '757471946876',
     projectId: 'zeal-product',
     storageBucket: 'zeal-product.firebasestorage.app',
