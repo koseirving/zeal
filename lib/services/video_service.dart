@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import '../models/video_model.dart';
 import 'local_storage_service.dart';
+import 'auth_service.dart';
 
 class VideoService {
   static final VideoService _instance = VideoService._internal();
@@ -24,6 +25,9 @@ class VideoService {
       debugPrint('VideoService: getVideos() called');
       debugPrint('VideoService: Environment: ${_auth.currentUser != null ? "Authenticated" : "Not authenticated"}');
       debugPrint('VideoService: User ID: ${_auth.currentUser?.uid ?? "None"}');
+      
+      // 認証確認と自動サインイン
+      await _ensureAuthenticated();
       
       // Try to get from Firestore first
       final videos = await _getVideosFromFirestore();
@@ -50,6 +54,30 @@ class VideoService {
       
       // Fallback to cached/local data
       return await _getVideosFromCache();
+    }
+  }
+
+  // 認証状態を確認し、必要に応じて匿名サインインを実行
+  Future<void> _ensureAuthenticated() async {
+    try {
+      if (_auth.currentUser == null) {
+        debugPrint('VideoService: No authenticated user, attempting anonymous sign-in...');
+        
+        final AuthService authService = AuthService();
+        final user = await authService.signInAnonymously();
+        
+        if (user != null) {
+          debugPrint('VideoService: Anonymous sign-in successful: ${user.id}');
+        } else {
+          debugPrint('VideoService: Anonymous sign-in failed');
+          throw Exception('Authentication failed - unable to access videos');
+        }
+      } else {
+        debugPrint('VideoService: User already authenticated: ${_auth.currentUser!.uid}');
+      }
+    } catch (e) {
+      debugPrint('VideoService: Authentication error: $e');
+      rethrow;
     }
   }
 

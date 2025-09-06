@@ -34,9 +34,28 @@ class _GoalTrackerContentState extends State<GoalTrackerContent> {
   
   Future<void> _loadLoginHistory() async {
     final userId = _authService.currentUserId;
-    if (userId == null) return;
+    
+    if (userId == null || userId.isEmpty) {
+      debugPrint('GoalTrackerContent: No valid userId, waiting for authentication...');
+      // 認証待機中は少し待ってからリトライ
+      await Future.delayed(const Duration(seconds: 2));
+      if (mounted) {
+        final retryUserId = _authService.currentUserId;
+        if (retryUserId != null && retryUserId.isNotEmpty) {
+          _loadLoginHistory(); // リトライ
+          return;
+        } else {
+          // 認証が完了していない場合はローディング状態を解除
+          setState(() {
+            _isLoading = false;
+          });
+          return;
+        }
+      }
+    }
     
     try {
+      debugPrint('GoalTrackerContent: Loading login history for user: $userId');
       final loginDays = await _loginHistoryService.getLoginDays(userId);
       final loginStats = await _loginHistoryService.getLoginStats(userId);
       
@@ -46,9 +65,10 @@ class _GoalTrackerContentState extends State<GoalTrackerContent> {
           _loginStats = loginStats;
           _isLoading = false;
         });
+        debugPrint('GoalTrackerContent: Login history loaded successfully');
       }
     } catch (e) {
-      debugPrint('Failed to load login history: $e');
+      debugPrint('GoalTrackerContent: Failed to load login history: $e');
       if (mounted) {
         setState(() {
           _isLoading = false;

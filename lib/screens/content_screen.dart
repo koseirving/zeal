@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../providers/video_provider.dart';
-import '../providers/music_provider.dart';
 import '../widgets/video_player_widget.dart';
 import '../services/video_service.dart';
 import '../services/video_player_manager.dart';
@@ -410,21 +409,41 @@ class _VideoContentState extends ConsumerState<_VideoContent> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      const Icon(
+                        Icons.video_library_outlined,
+                        color: Colors.white38,
+                        size: 64,
+                      ),
+                      const SizedBox(height: 16),
                       const Text(
-                        'No videos available',
+                        'ビデオを読み込み中...',
                         style: TextStyle(
                           color: Colors.white70,
                           fontSize: 18,
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 8),
+                      const Text(
+                        '認証の確認とデータの取得を行っています',
+                        style: TextStyle(
+                          color: Colors.white54,
+                          fontSize: 14,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 24),
+                      const CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF6B35)),
+                      ),
+                      const SizedBox(height: 24),
                       ElevatedButton(
                         onPressed: _refreshVideos,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFFFF6B35),
+                          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                         ),
                         child: const Text(
-                          'Refresh',
+                          'リトライ',
                           style: TextStyle(color: Colors.white),
                         ),
                       ),

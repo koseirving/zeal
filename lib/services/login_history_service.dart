@@ -68,7 +68,13 @@ class LoginHistoryService {
     }
   }
 
-  Future<Set<DateTime>> getLoginDays(String userId) async {
+  Future<Set<DateTime>> getLoginDays(String? userId) async {
+    // 認証ガード
+    if (userId == null || userId.isEmpty) {
+      debugPrint('LoginHistoryService: No valid userId provided, returning empty set');
+      return {};
+    }
+
     try {
       debugPrint('LoginHistoryService: Fetching login days for user: $userId');
       debugPrint('LoginHistoryService: Query path: users/$userId/login_history');
@@ -110,7 +116,17 @@ class LoginHistoryService {
     }
   }
 
-  Future<Map<String, int>> getLoginStats(String userId) async {
+  Future<Map<String, int>> getLoginStats(String? userId) async {
+    // 認証ガード
+    if (userId == null || userId.isEmpty) {
+      debugPrint('LoginHistoryService: No valid userId provided, returning default stats');
+      return {
+        'totalDays': 0,
+        'thisWeek': 0,
+        'streak': 0,
+      };
+    }
+
     try {
       debugPrint('LoginHistoryService: Calculating login stats for user: $userId');
       

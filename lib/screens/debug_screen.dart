@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../services/debug_service.dart';
 import '../services/simple_debug_service.dart';
 import '../services/video_service.dart';
 import '../services/music_service.dart';
 import '../services/affirmation_service.dart';
+import '../services/auth_service.dart';
 
 class DebugScreen extends ConsumerStatefulWidget {
   const DebugScreen({super.key});
@@ -23,6 +25,32 @@ class _DebugScreenState extends ConsumerState<DebugScreen> {
   void initState() {
     super.initState();
     _runSimpleTest();
+  }
+
+  // 認証状態の詳細情報を取得
+  Map<String, dynamic> _getAuthDebugInfo() {
+    final auth = FirebaseAuth.instance;
+    final authService = AuthService();
+    final currentUser = auth.currentUser;
+    
+    return {
+      'hasCurrentUser': currentUser != null,
+      'userId': currentUser?.uid,
+      'email': currentUser?.email,
+      'displayName': currentUser?.displayName,
+      'isAnonymous': currentUser?.isAnonymous ?? false,
+      'isEmailVerified': currentUser?.emailVerified ?? false,
+      'creationTime': currentUser?.metadata.creationTime?.toIso8601String(),
+      'lastSignInTime': currentUser?.metadata.lastSignInTime?.toIso8601String(),
+      'providerData': currentUser?.providerData.map((info) => {
+        'providerId': info.providerId,
+        'uid': info.uid,
+        'email': info.email,
+        'displayName': info.displayName,
+      }).toList(),
+      'isAuthenticated': authService.isAuthenticated,
+      'currentUserId': authService.currentUserId,
+    };
   }
 
   Future<void> _runSimpleTest() async {
@@ -262,6 +290,46 @@ class _DebugScreenState extends ConsumerState<DebugScreen> {
             ],
             
             const SizedBox(height: 24),
+            
+            // 認証状態の詳細表示
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '🔐 Authentication Status (Detailed)',
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                    const SizedBox(height: 12),
+                    ...() {
+                      final authInfo = _getAuthDebugInfo();
+                      return [
+                        _buildStatusRow('Has Current User', authInfo['hasCurrentUser']),
+                        if (authInfo['userId'] != null)
+                          _buildInfoRow('User ID', authInfo['userId']),
+                        if (authInfo['email'] != null)
+                          _buildInfoRow('Email', authInfo['email']),
+                        if (authInfo['displayName'] != null)
+                          _buildInfoRow('Display Name', authInfo['displayName']),
+                        _buildStatusRow('Is Anonymous', authInfo['isAnonymous']),
+                        _buildStatusRow('Email Verified', authInfo['isEmailVerified']),
+                        if (authInfo['creationTime'] != null)
+                          _buildInfoRow('Created At', authInfo['creationTime']),
+                        if (authInfo['lastSignInTime'] != null)
+                          _buildInfoRow('Last Sign In', authInfo['lastSignInTime']),
+                        _buildStatusRow('Auth Service Authenticated', authInfo['isAuthenticated']),
+                        if (authInfo['currentUserId'] != null)
+                          _buildInfoRow('Auth Service User ID', authInfo['currentUserId']),
+                      ];
+                    }(),
+                  ],
+                ),
+              ),
+            ),
+            
+            const SizedBox(height: 16),
             
             Text(
               'Service Cache Info',
