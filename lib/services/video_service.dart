@@ -21,10 +21,15 @@ class VideoService {
   // Get all videos with offline support
   Future<List<VideoModel>> getVideos() async {
     try {
+      debugPrint('VideoService: getVideos() called');
+      debugPrint('VideoService: Environment: ${_auth.currentUser != null ? "Authenticated" : "Not authenticated"}');
+      debugPrint('VideoService: User ID: ${_auth.currentUser?.uid ?? "None"}');
+      
       // Try to get from Firestore first
       final videos = await _getVideosFromFirestore();
       
       if (videos.isNotEmpty) {
+        debugPrint('VideoService: Successfully retrieved ${videos.length} videos from Firestore');
         // Cache successful result
         _cachedVideos = videos;
         _lastCacheUpdate = DateTime.now();
@@ -35,11 +40,13 @@ class VideoService {
         return videos;
       }
       
+      debugPrint('VideoService: No videos found in Firestore, falling back to cache');
       // Fallback to cached data
       return await _getVideosFromCache();
       
     } catch (e) {
       debugPrint('VideoService: Error fetching videos: $e');
+      debugPrint('VideoService: Falling back to cached/local data');
       
       // Fallback to cached/local data
       return await _getVideosFromCache();
@@ -49,120 +56,83 @@ class VideoService {
   // Get videos from Firestore
   Future<List<VideoModel>> _getVideosFromFirestore() async {
     try {
+      debugPrint('VideoService: Attempting to fetch videos from Firestore...');
+      debugPrint('VideoService: Project ID: zeal-product');
+      
       final querySnapshot = await _firestore
           .collection('videos')
           .where('isActive', isEqualTo: true)
           .get()
           .timeout(const Duration(seconds: 10));
       
+      debugPrint('VideoService: Query executed successfully');
+      debugPrint('VideoService: Found ${querySnapshot.docs.length} documents');
+      
       final videos = querySnapshot.docs
-          .map((doc) => VideoModel.fromFirestore(doc))
+          .map((doc) {
+            debugPrint('VideoService: Processing doc ID: ${doc.id}');
+            return VideoModel.fromFirestore(doc);
+          })
           .toList();
       
       // Sort by createdAt in memory since we can't use orderBy without index
       videos.sort((a, b) => b.createdAt.compareTo(a.createdAt));
       
+      debugPrint('VideoService: Successfully fetched ${videos.length} videos from Firestore');
       return videos;
           
     } catch (e) {
       debugPrint('VideoService: Firestore error: $e');
+      debugPrint('VideoService: Error type: ${e.runtimeType}');
+      if (e.toString().contains('permission')) {
+        debugPrint('VideoService: Permission denied - check Firestore rules');
+      } else if (e.toString().contains('index')) {
+        debugPrint('VideoService: Index required - check Firestore indexes');
+      } else if (e.toString().contains('network')) {
+        debugPrint('VideoService: Network error - check connectivity');
+      }
       rethrow;
     }
   }
 
   // Get videos from cache or local storage
   Future<List<VideoModel>> _getVideosFromCache() async {
+    debugPrint('VideoService: Attempting to retrieve videos from cache...');
+    
     // Check memory cache first
     if (_cachedVideos != null && _lastCacheUpdate != null) {
       final cacheAge = DateTime.now().difference(_lastCacheUpdate!);
       if (cacheAge < _cacheValidDuration) {
-        debugPrint('VideoService: Returning from memory cache');
+        debugPrint('VideoService: Returning ${_cachedVideos!.length} videos from memory cache (age: ${cacheAge.inMinutes} minutes)');
         return _cachedVideos!;
+      } else {
+        debugPrint('VideoService: Memory cache expired (age: ${cacheAge.inMinutes} minutes)');
       }
+    } else {
+      debugPrint('VideoService: No memory cache available');
     }
     
     // Try local storage
     try {
+      debugPrint('VideoService: Attempting to load from local storage...');
       final localVideos = await _getVideosFromLocal();
       if (localVideos.isNotEmpty) {
-        debugPrint('VideoService: Returning from local storage');
+        debugPrint('VideoService: Returning ${localVideos.length} videos from local storage');
         _cachedVideos = localVideos;
         return localVideos;
+      } else {
+        debugPrint('VideoService: No videos found in local storage');
       }
     } catch (e) {
       debugPrint('VideoService: Local storage error: $e');
     }
     
-    // Fallback to mock data if all else fails
-    debugPrint('VideoService: Returning mock data as fallback');
-    return _getMockVideos();
+    // Return empty list if all else fails in production
+    debugPrint('VideoService: ERROR - No data available from any source');
+    debugPrint('VideoService: Returning empty list');
+    return [];
   }
 
-  // Get mock videos for fallback
-  List<VideoModel> _getMockVideos() {
-    return [
-      VideoModel(
-        id: '1',
-        title: 'Never Give Up - Motivational Speech',
-        description: 'A powerful speech about perseverance and achieving your dreams. Learn how to push through challenges and never give up on your goals.',
-        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-        thumbnailUrl: 'https://via.placeholder.com/300x400/6366F1/FFFFFF?text=Never+Give+Up',
-        category: 'Motivation',
-        likes: 1240,
-        views: 15670,
-        createdAt: DateTime.now().subtract(const Duration(days: 2)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 2)),
-      ),
-      VideoModel(
-        id: '2',
-        title: 'Success Mindset - Daily Habits',
-        description: 'Discover the daily habits that successful people practice every day. Transform your mindset and achieve extraordinary results.',
-        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-        thumbnailUrl: 'https://via.placeholder.com/300x400/8B5CF6/FFFFFF?text=Success+Mindset',
-        category: 'Success',
-        likes: 890,
-        views: 12450,
-        createdAt: DateTime.now().subtract(const Duration(days: 5)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 5)),
-      ),
-      VideoModel(
-        id: '3',
-        title: 'Overcome Fear - Face Your Challenges',
-        description: 'Learn how to overcome fear and step out of your comfort zone. Build confidence and tackle any challenge that comes your way.',
-        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-        thumbnailUrl: 'https://via.placeholder.com/300x400/A855F7/FFFFFF?text=Overcome+Fear',
-        category: 'Personal Growth',
-        likes: 567,
-        views: 8920,
-        createdAt: DateTime.now().subtract(const Duration(days: 7)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 7)),
-      ),
-      VideoModel(
-        id: '4',
-        title: 'Dream Big - Visualization Techniques',
-        description: 'Master the art of visualization to manifest your dreams. Learn powerful techniques used by top performers worldwide.',
-        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
-        thumbnailUrl: 'https://via.placeholder.com/300x400/06B6D4/FFFFFF?text=Dream+Big',
-        category: 'Visualization',
-        likes: 2100,
-        views: 25300,
-        createdAt: DateTime.now().subtract(const Duration(days: 10)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 10)),
-      ),
-      VideoModel(
-        id: '5',
-        title: 'Morning Motivation - Start Strong',
-        description: 'Energize your mornings with this powerful motivational message. Set the tone for a productive and successful day.',
-        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
-        thumbnailUrl: 'https://via.placeholder.com/300x400/F59E0B/FFFFFF?text=Morning+Power',
-        category: 'Morning Motivation',
-        likes: 1780,
-        views: 19650,
-        createdAt: DateTime.now().subtract(const Duration(days: 1)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 1)),
-      ),
-    ];
-  }
 
   // Get video by ID
   Future<VideoModel?> getVideoById(String id) async {

@@ -63,6 +63,6 @@ class DefaultFirebaseOptions {
     messagingSenderId: '757471946876',
     projectId: 'zeal-product',
     storageBucket: 'zeal-product.firebasestorage.app',
-    iosBundleId: 'com.zeal.zeal',
+    iosBundleId: 'com.koseioishi.zeal',
   );
 }

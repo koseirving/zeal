@@ -13,6 +13,9 @@ class LoginHistoryService {
 
   Future<void> recordLogin(String userId) async {
     try {
+      debugPrint('LoginHistoryService: Recording login for user: $userId');
+      debugPrint('LoginHistoryService: Firestore project: zeal-product');
+      
       final deviceInfo = await _getDeviceInfo().timeout(
         const Duration(seconds: 5),
         onTimeout: () => {
@@ -21,6 +24,8 @@ class LoginHistoryService {
           'version': 'Unknown',
         },
       );
+      
+      debugPrint('LoginHistoryService: Device info collected: ${deviceInfo['platform']} - ${deviceInfo['model']}');
       
       final packageInfo = await PackageInfo.fromPlatform().timeout(
         const Duration(seconds: 5),
@@ -32,6 +37,8 @@ class LoginHistoryService {
         ),
       );
       
+      debugPrint('LoginHistoryService: App version: ${packageInfo.version} (${packageInfo.buildNumber})');
+      
       final loginSession = {
         'loginAt': FieldValue.serverTimestamp(),
         'deviceInfo': deviceInfo,
@@ -39,20 +46,33 @@ class LoginHistoryService {
         'buildNumber': packageInfo.buildNumber,
       };
 
+      debugPrint('LoginHistoryService: Writing to Firestore path: users/$userId/login_history');
+      
       await _firestore
           .collection('users')
           .doc(userId)
           .collection('login_history')
           .add(loginSession)
           .timeout(const Duration(seconds: 10));
+          
+      debugPrint('LoginHistoryService: Login recorded successfully');
     } catch (e) {
-      debugPrint('Failed to record login: $e');
+      debugPrint('LoginHistoryService: Failed to record login: $e');
+      debugPrint('LoginHistoryService: Error type: ${e.runtimeType}');
+      if (e.toString().contains('permission')) {
+        debugPrint('LoginHistoryService: Permission denied - check Firestore rules');
+      } else if (e.toString().contains('network')) {
+        debugPrint('LoginHistoryService: Network error - check connectivity');
+      }
       // Don't throw the error - login history is not critical for app functionality
     }
   }
 
   Future<Set<DateTime>> getLoginDays(String userId) async {
     try {
+      debugPrint('LoginHistoryService: Fetching login days for user: $userId');
+      debugPrint('LoginHistoryService: Query path: users/$userId/login_history');
+      
       final querySnapshot = await _firestore
           .collection('users')
           .doc(userId)
@@ -61,6 +81,8 @@ class LoginHistoryService {
           .get()
           .timeout(const Duration(seconds: 10));
 
+      debugPrint('LoginHistoryService: Found ${querySnapshot.docs.length} login records');
+      
       final loginDays = <DateTime>{};
       for (final doc in querySnapshot.docs) {
         final data = doc.data();
@@ -68,39 +90,58 @@ class LoginHistoryService {
         if (loginAt != null) {
           final dateOnly = DateTime(loginAt.year, loginAt.month, loginAt.day);
           loginDays.add(dateOnly);
+          debugPrint('LoginHistoryService: Added login day: ${dateOnly.toString().split(' ')[0]}');
         }
       }
 
+      debugPrint('LoginHistoryService: Total unique login days: ${loginDays.length}');
       return loginDays;
     } catch (e) {
-      debugPrint('Failed to get login days: $e');
+      debugPrint('LoginHistoryService: Failed to get login days: $e');
+      debugPrint('LoginHistoryService: Error type: ${e.runtimeType}');
+      if (e.toString().contains('permission')) {
+        debugPrint('LoginHistoryService: Permission denied - check Firestore rules');
+      } else if (e.toString().contains('index')) {
+        debugPrint('LoginHistoryService: Index required - check Firestore indexes');
+      } else if (e.toString().contains('network')) {
+        debugPrint('LoginHistoryService: Network error - check connectivity');
+      }
       return {};
     }
   }
 
   Future<Map<String, int>> getLoginStats(String userId) async {
     try {
+      debugPrint('LoginHistoryService: Calculating login stats for user: $userId');
+      
       final loginDays = await getLoginDays(userId);
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
       
       final totalDays = loginDays.length;
+      debugPrint('LoginHistoryService: Total login days: $totalDays');
       
       final thisWeekStart = today.subtract(Duration(days: today.weekday - 1));
       final thisWeekEnd = thisWeekStart.add(const Duration(days: 6));
       final thisWeekCount = loginDays.where((date) => 
           date.isAfter(thisWeekStart.subtract(const Duration(days: 1))) && 
           date.isBefore(thisWeekEnd.add(const Duration(days: 1)))).length;
+      debugPrint('LoginHistoryService: This week login count: $thisWeekCount');
       
       final streak = _calculateStreak(loginDays, today);
+      debugPrint('LoginHistoryService: Current streak: $streak days');
 
-      return {
+      final stats = {
         'totalDays': totalDays,
         'thisWeek': thisWeekCount,
         'streak': streak,
       };
+      
+      debugPrint('LoginHistoryService: Login stats calculated successfully');
+      return stats;
     } catch (e) {
-      debugPrint('Failed to get login stats: $e');
+      debugPrint('LoginHistoryService: Failed to get login stats: $e');
+      debugPrint('LoginHistoryService: Returning default stats');
       return {
         'totalDays': 0,
         'thisWeek': 0,
