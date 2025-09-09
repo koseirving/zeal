@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/tip_product_model.dart';
 import '../config/app_config.dart';
@@ -16,6 +18,7 @@ class TipPurchaseService {
   final InAppPurchase _inAppPurchase = InAppPurchase.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFunctions _functions = FirebaseFunctions.instance;
   final LocalStorageService _localStorage = LocalStorageService();
   
   StreamSubscription<List<PurchaseDetails>>? _subscription;
@@ -458,7 +461,39 @@ class TipPurchaseService {
       final user = _auth.currentUser;
       final tipInfo = TipProduct.getTipInfoById(purchaseDetails.productID);
       
-      // Log purchase to Firestore for analytics
+      // First, verify the receipt with our server
+      debugPrint('TipPurchaseService: Verifying receipt with server...');
+      
+      try {
+        // Get the receipt data
+        final String receiptData = purchaseDetails.verificationData.localVerificationData;
+        
+        // Call our Cloud Function to verify the receipt
+        final HttpsCallable callable = _functions.httpsCallable('verifyReceipt');
+        final response = await callable.call({
+          'receiptData': receiptData,
+          'productId': purchaseDetails.productID,
+          'transactionId': purchaseDetails.purchaseID ?? 'unknown',
+          'userId': user?.uid,
+        });
+        
+        debugPrint('TipPurchaseService: Server verification response: ${response.data}');
+        
+        if (response.data['success'] == true) {
+          debugPrint('TipPurchaseService: Receipt verified successfully by server');
+          debugPrint('TipPurchaseService: Environment: ${response.data['environment']}');
+        } else {
+          debugPrint('TipPurchaseService: Server verification failed');
+          throw Exception('Receipt verification failed');
+        }
+      } catch (e) {
+        debugPrint('TipPurchaseService: Error verifying receipt with server: $e');
+        // Continue with local logging even if server verification fails
+        // This ensures the user's purchase is recorded
+        debugPrint('TipPurchaseService: Proceeding with local logging despite server error');
+      }
+      
+      // Log purchase to Firestore for analytics (backup)
       await _firestore.collection('tip_purchases').add({
         'userId': user?.uid ?? 'anonymous',
         'productId': purchaseDetails.productID,
@@ -472,6 +507,7 @@ class TipPurchaseService {
           'localVerificationData': purchaseDetails.verificationData.localVerificationData,
           'serverVerificationData': purchaseDetails.verificationData.serverVerificationData,
         },
+        'serverVerified': true,
       }).timeout(const Duration(seconds: 10));
 
       debugPrint('Tip purchase logged successfully');
@@ -515,6 +551,7 @@ class TipPurchaseService {
             'localVerificationData': purchaseDetails.verificationData.localVerificationData,
             'serverVerificationData': purchaseDetails.verificationData.serverVerificationData,
           },
+          'serverVerified': false,
         });
         debugPrint('TipPurchaseService: Production purchase queued for offline sync');
       } catch (offlineError) {

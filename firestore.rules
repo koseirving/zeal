@@ -39,6 +39,20 @@ service cloud.firestore {
       }
     }
     
+    // Tip purchases collection - users can read their own purchases
+    match /tip_purchases/{purchaseId} {
+      allow read: if request.auth != null && 
+        request.auth.uid == resource.data.userId;
+      allow write: if false; // Only via Firebase Admin SDK
+    }
+    
+    // Verified purchases collection - users can read their own verified purchases  
+    match /verified_purchases/{transactionId} {
+      allow read: if request.auth != null && 
+        request.auth.uid == resource.data.userId;
+      allow write: if false; // Only via Firebase Admin SDK
+    }
+    
     // Default deny all
     match /{document=**} {
       allow read, write: if false;

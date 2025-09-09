@@ -80,6 +80,7 @@ dependencies:
   # Device & Package Info
   device_info_plus: ^10.1.2
   package_info_plus: ^8.0.3
+  cloud_functions: ^5.6.2
 
 dev_dependencies:
   flutter_test:
